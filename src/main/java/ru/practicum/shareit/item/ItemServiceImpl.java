@@ -28,13 +28,13 @@ public class ItemServiceImpl implements ItemService{
     }
 
     @Override
-    public Item update(long userId, long itemId, Item item) {
+    public Item update(long userId, long itemId, Item item) throws DataNotFoundException, ValidationException{
 
         User userDB = userRepository.findById(userId);
         if (userDB == null) {
             throw new DataNotFoundException("User not found");
         }
-        Item itemDB = itemRepository.findById(userId, itemId);
+        Item itemDB = itemRepository.findById(itemId);
         if (itemDB == null) {
             throw new DataNotFoundException("Item not found");
         }
@@ -64,8 +64,8 @@ public class ItemServiceImpl implements ItemService{
     }
 
     @Override
-    public Item get(long userId, long itemId) {
-        return itemRepository.findById(userId, itemId);
+    public Item get(long itemId) {
+        return itemRepository.findById(itemId);
     }
 
     @Override

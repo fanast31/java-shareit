@@ -13,12 +13,8 @@ public class ItemRepositoryImpl implements ItemRepository{
     private final Map<Long, Item> items = new HashMap<>();
 
     @Override
-    public Item findById(long userId, long itemId) {
-        Item item = items.get(itemId);
-        if (item == null || item.getOwner() == null || item.getOwner().getId() != userId) {
-            return null;
-        }
-        return item;
+    public Item findById(long itemId) {
+        return items.get(itemId);
     }
 
     @Override

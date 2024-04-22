@@ -39,14 +39,22 @@ public class ItemController {
                 @RequestHeader("X-Sharer-User-Id") long userId,
                 @PathVariable long itemId,
                 @RequestBody ItemDto itemDto) throws DataNotFoundException, ValidationException {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                ItemMapper.toItemDto(itemService.update(userId, itemId, ItemMapper.toItem(itemDto)))
-        );
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    ItemMapper.toItemDto(itemService.update(userId, itemId, ItemMapper.toItem(itemDto)))
+            );
+        } catch (DataNotFoundException dataNotFoundException) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (ValidationException validationException) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<ItemDto> get(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long itemId) {
-        return ResponseEntity.status(HttpStatus.OK).body(ItemMapper.toItemDto(itemService.get(userId, itemId)));
+    public ResponseEntity<ItemDto> get(@PathVariable long itemId) {
+        return ResponseEntity.status(HttpStatus.OK).body(ItemMapper.toItemDto(itemService.get(itemId)));
     }
 
     @GetMapping
