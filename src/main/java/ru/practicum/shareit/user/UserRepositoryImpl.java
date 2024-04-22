@@ -32,7 +32,7 @@ public class UserRepositoryImpl implements UserRepository {
         if (userDuplicateEmail != null) {
             throw new ValidationException("Duplicate email");
         }
-        if(user.getId() == null) {
+        if (user.getId() == null) {
             user.setId(id++);
         }
         users.put(user.getId(), user);

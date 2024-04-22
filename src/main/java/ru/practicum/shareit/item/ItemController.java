@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,8 +22,8 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<ItemDto> create(
-                @RequestHeader("X-Sharer-User-Id") long userId,
-                @Valid @RequestBody ItemDto itemDto) throws DataNotFoundException{
+            @RequestHeader("X-Sharer-User-Id") long userId,
+            @Valid @RequestBody ItemDto itemDto) throws DataNotFoundException {
         try {
             ItemDto itemDtoResponse = ItemMapper.toItemDto(itemService.create(userId, ItemMapper.toItem(itemDto)));
             return ResponseEntity.status(HttpStatus.CREATED).body(itemDtoResponse);
@@ -36,11 +36,11 @@ public class ItemController {
 
     @PatchMapping("/{itemId}")
     public ResponseEntity<ItemDto> update(
-                @RequestHeader("X-Sharer-User-Id") long userId,
-                @PathVariable long itemId,
-                @RequestBody ItemDto itemDto) throws DataNotFoundException, ValidationException {
+            @RequestHeader("X-Sharer-User-Id") long userId,
+            @PathVariable long itemId,
+            @RequestBody ItemDto itemDto) throws DataNotFoundException, ValidationException {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(
+            return ResponseEntity.ok().body(
                     ItemMapper.toItemDto(itemService.update(userId, itemId, ItemMapper.toItem(itemDto)))
             );
         } catch (DataNotFoundException dataNotFoundException) {
@@ -54,15 +54,25 @@ public class ItemController {
 
     @GetMapping("/{itemId}")
     public ResponseEntity<ItemDto> get(@PathVariable long itemId) {
-        return ResponseEntity.status(HttpStatus.OK).body(ItemMapper.toItemDto(itemService.get(itemId)));
+        return ResponseEntity.ok().body(ItemMapper.toItemDto(itemService.get(itemId)));
     }
 
     @GetMapping
     public ResponseEntity<List<ItemDto>> getAll(@RequestHeader("X-Sharer-User-Id") long userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(
+        return ResponseEntity.ok().body(
                 itemService.getAll(userId).stream()
                         .map(ItemMapper::toItemDto)
                         .collect(Collectors.toList()));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<ItemDto>> searchItems(@RequestParam("text") String searchText) {
+        String trimString = searchText.trim();
+        if (trimString.isEmpty()) {
+            return ResponseEntity.ok().body(Collections.emptyList());
+        }
+        return ResponseEntity.ok(itemService.searchByText(trimString).stream()
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList()));
+    }
 }

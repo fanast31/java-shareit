@@ -14,6 +14,7 @@ public class ItemMapper {
                 item.getAvailable()
         );
     }
+
     public static Item toItem(ItemDto itemDto) {
         if (itemDto == null) {
             return null;

@@ -11,7 +11,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ItemServiceImpl implements ItemService{
+public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
 
@@ -28,7 +28,7 @@ public class ItemServiceImpl implements ItemService{
     }
 
     @Override
-    public Item update(long userId, long itemId, Item item) throws DataNotFoundException, ValidationException{
+    public Item update(long userId, long itemId, Item item) throws DataNotFoundException, ValidationException {
 
         User userDB = userRepository.findById(userId);
         if (userDB == null) {
@@ -76,5 +76,10 @@ public class ItemServiceImpl implements ItemService{
     @Override
     public void delete(long itemId) {
         itemRepository.delete(itemId);
+    }
+
+    @Override
+    public List<Item> searchByText(String searchText) {
+        return itemRepository.searchByText(searchText);
     }
 }

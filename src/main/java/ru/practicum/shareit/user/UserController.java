@@ -23,14 +23,14 @@ public class UserController {
     public ResponseEntity<UserDto> create(@Valid @RequestBody UserDto userDto) throws ValidationException {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 UserMapper.toUserDto(userService.create(UserMapper.toUser(userDto)))
-            );
+        );
     }
 
     @PatchMapping("/{userId}")
     public ResponseEntity<UserDto> update(@PathVariable long userId, @RequestBody UserDto userDto) throws DataNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(
                 UserMapper.toUserDto(userService.update(userId, UserMapper.toUser(userDto)))
-            );
+        );
     }
 
     @GetMapping("/{userId}")
