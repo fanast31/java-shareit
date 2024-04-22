@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
+import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -17,7 +18,7 @@ public class ItemServiceImpl implements ItemService{
     private final UserRepository userRepository;
 
     @Override
-    public Item create(long userId, Item item) {
+    public Item create(long userId, Item item) throws DataNotFoundException {
         User user = userRepository.findById(userId);
         if (user == null) {
             throw new DataNotFoundException("User not found");
@@ -27,22 +28,53 @@ public class ItemServiceImpl implements ItemService{
     }
 
     @Override
-    public Item update(long itemId, Item item) {
-        return null;
+    public Item update(long userId, long itemId, Item item) {
+
+        User userDB = userRepository.findById(userId);
+        if (userDB == null) {
+            throw new DataNotFoundException("User not found");
+        }
+        Item itemDB = itemRepository.findById(userId, itemId);
+        if (itemDB == null) {
+            throw new DataNotFoundException("Item not found");
+        }
+        if (!itemDB.getOwner().equals(userDB)) {
+            throw new ValidationException("The item can only be changed by the owner");
+        }
+
+        Item newItem = new Item(
+                itemDB.getId(),
+                itemDB.getName(),
+                itemDB.getDescription(),
+                itemDB.getAvailable(),
+                itemDB.getOwner(),
+                itemDB.getRequest());
+        if (item.getName() != null) {
+            newItem.setName(item.getName());
+        }
+        if (item.getDescription() != null) {
+            newItem.setDescription(item.getDescription());
+        }
+        if (item.getAvailable() != null) {
+            newItem.setAvailable(item.getAvailable());
+        }
+
+        itemRepository.save(newItem);
+        return newItem;
     }
 
     @Override
-    public Item get(long itemId) {
-        return null;
+    public Item get(long userId, long itemId) {
+        return itemRepository.findById(userId, itemId);
     }
 
     @Override
-    public List<Item> getAll() {
-        return null;
+    public List<Item> getAll(long userId) {
+        return itemRepository.getAll(userId);
     }
 
     @Override
     public void delete(long itemId) {
-
+        itemRepository.delete(itemId);
     }
 }

@@ -3,6 +3,7 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
+import ru.practicum.shareit.exceptions.ValidationException;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
 
     @Override
-    public User create(User user) {
+    public User create(User user) throws ValidationException {
         return userRepository.save(user);
     }
 
