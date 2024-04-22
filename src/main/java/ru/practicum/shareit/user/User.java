@@ -8,10 +8,14 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
 @Data
-@AllArgsConstructor
 public class User {
 
     private Long id;
+
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
 
     @NotBlank
     private String name;

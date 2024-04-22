@@ -8,19 +8,14 @@ public class ItemMapper {
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
-                item.isAvailable(),
-                item.getOwner(),
-                item.getRequest()
+                item.getAvailable()
         );
     }
     public static Item toItem(ItemDto itemDto) {
         return new Item(
-                itemDto.getId(),
                 itemDto.getName(),
                 itemDto.getDescription(),
-                itemDto.isAvailable(),
-                itemDto.getOwner(),
-                itemDto.getRequest()
+                itemDto.getAvailable()
         );
     }
 }
