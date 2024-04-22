@@ -26,13 +26,13 @@ public class ItemController {
         );
     }
 
-    /*@PatchMapping("/{userId}")
+   /* @PatchMapping("/{userId}")
     public ResponseEntity<ItemDto> update(@PathVariable long itemId, @RequestBody ItemDto itemDto) throws DataNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(
                 ItemMapper.toItemDto(itemService.update(itemId, ItemMapper.toItem(itemDto)))
         );
     }
-
+/*
     @GetMapping("/{userId}")
     public ResponseEntity<ItemDto> get(@PathVariable long itemId) {
         return ResponseEntity.status(HttpStatus.OK).body(ItemMapper.toItemDto(itemService.get(itemId)));
