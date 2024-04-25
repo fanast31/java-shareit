@@ -1,11 +1,9 @@
 package ru.practicum.shareit.item;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.exceptions.DataNotFoundException;
-import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import javax.validation.Valid;
@@ -15,7 +13,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/items")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ItemController {
 
     private final ItemService itemService;
@@ -23,33 +21,19 @@ public class ItemController {
     @PostMapping
     public ResponseEntity<ItemDto> create(
             @RequestHeader("X-Sharer-User-Id") long userId,
-            @Valid @RequestBody ItemDto itemDto) throws DataNotFoundException {
-        try {
-            ItemDto itemDtoResponse = ItemMapper.toItemDto(itemService.create(userId, ItemMapper.toItem(itemDto)));
-            return ResponseEntity.status(HttpStatus.CREATED).body(itemDtoResponse);
-        } catch (DataNotFoundException dataNotFoundException) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+            @Valid @RequestBody ItemDto itemDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ItemMapper.toItemDto(itemService.create(userId, ItemMapper.toItem(itemDto))));
     }
 
     @PatchMapping("/{itemId}")
     public ResponseEntity<ItemDto> update(
             @RequestHeader("X-Sharer-User-Id") long userId,
             @PathVariable long itemId,
-            @RequestBody ItemDto itemDto) throws DataNotFoundException, ValidationException {
-        try {
-            return ResponseEntity.ok().body(
-                    ItemMapper.toItemDto(itemService.update(userId, itemId, ItemMapper.toItem(itemDto)))
-            );
-        } catch (DataNotFoundException dataNotFoundException) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } catch (ValidationException validationException) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+            @RequestBody ItemDto itemDto) {
+        return ResponseEntity.ok().body(
+                ItemMapper.toItemDto(itemService.update(userId, itemId, ItemMapper.toItem(itemDto)))
+        );
     }
 
     @GetMapping("/{itemId}")
@@ -67,11 +51,10 @@ public class ItemController {
 
     @GetMapping("/search")
     public ResponseEntity<List<ItemDto>> searchItems(@RequestParam("text") String searchText) {
-        String trimString = searchText.trim();
-        if (trimString.isEmpty()) {
+        if (searchText == null || searchText.isBlank()) {
             return ResponseEntity.ok().body(Collections.emptyList());
         }
-        return ResponseEntity.ok(itemService.searchByText(trimString).stream()
+        return ResponseEntity.ok(itemService.searchByText(searchText).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList()));
     }

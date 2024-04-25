@@ -2,6 +2,7 @@ package ru.practicum.shareit.user;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exceptions.ValidationException;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
 
@@ -22,7 +23,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User save(User user) throws ValidationException {
+    public User save(User user) {
         User userDuplicateEmail =
                 users.values().stream()
                         .filter(user1 -> user1.getEmail().equals(user.getEmail()))

@@ -1,11 +1,9 @@
 package ru.practicum.shareit.user;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.exceptions.DataNotFoundException;
-import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.validation.Valid;
@@ -14,20 +12,20 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/users")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserDto> create(@Valid @RequestBody UserDto userDto) throws ValidationException {
+    public ResponseEntity<UserDto> create(@Valid @RequestBody UserDto userDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 UserMapper.toUserDto(userService.create(UserMapper.toUser(userDto)))
         );
     }
 
     @PatchMapping("/{userId}")
-    public ResponseEntity<UserDto> update(@PathVariable long userId, @RequestBody UserDto userDto) throws DataNotFoundException {
+    public ResponseEntity<UserDto> update(@PathVariable long userId, @RequestBody UserDto userDto) {
         return ResponseEntity.status(HttpStatus.OK).body(
                 UserMapper.toUserDto(userService.update(userId, UserMapper.toUser(userDto)))
         );
@@ -47,7 +45,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> delete(@PathVariable long userId) throws DataNotFoundException {
+    public ResponseEntity<Void> delete(@PathVariable long userId) {
         userService.delete(userId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
