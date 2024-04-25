@@ -8,7 +8,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -19,29 +18,22 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDto> create(@Valid @RequestBody UserDto userDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                UserMapper.toUserDto(userService.create(UserMapper.toUser(userDto)))
-        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(userDto));
     }
 
     @PatchMapping("/{userId}")
     public ResponseEntity<UserDto> update(@PathVariable long userId, @RequestBody UserDto userDto) {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                UserMapper.toUserDto(userService.update(userId, UserMapper.toUser(userDto)))
-        );
+        return ResponseEntity.status(HttpStatus.OK).body(userService.update(userId, userDto));
     }
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserDto> get(@PathVariable long userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(UserMapper.toUserDto(userService.get(userId)));
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserDto(userId));
     }
 
     @GetMapping
     public ResponseEntity<List<UserDto>> getAll() {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                userService.getAll().stream()
-                        .map(UserMapper::toUserDto)
-                        .collect(Collectors.toList()));
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getAll());
     }
 
     @DeleteMapping("/{userId}")
