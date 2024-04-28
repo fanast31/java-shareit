@@ -23,10 +23,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto update(long userId, UserDto userDto) {
 
-        User userDB = userRepository.findById(userId);
-        if (userDB == null) {
-            throw new DataNotFoundException("User not found");
-        }
+        User userDB = userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("User not found"));
 
         User user = UserMapper.toUser(userDto);
         user.setId(userDB.getId());
@@ -42,33 +40,28 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUser(long userId) {
-        User user = userRepository.findById(userId);
-        if (user == null) {
-            throw new DataNotFoundException("User not found");
-        }
-        return user;
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("User not found"));
     }
 
     @Override
     public UserDto getUserDto(long userId) {
-        User user = getUser(userId);
-        return UserMapper.toUserDto(user);
+        return UserMapper.toUserDto(userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("User not found")));
     }
 
     @Override
     public List<UserDto> getAll() {
-        return userRepository.getAll().stream()
+        return userRepository.findAll().stream()
                         .map(UserMapper::toUserDto)
                         .collect(Collectors.toList());
     }
 
     @Override
     public void delete(long userId) {
-        User user = userRepository.findById(userId);
-        if (user == null) {
-            throw new DataNotFoundException("User not found");
-        }
-        userRepository.delete(user.getId());
+        User userDB = userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("User not found"));
+        userRepository.delete(userDB);
     }
 
 }
