@@ -31,7 +31,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto update(long userId, long itemId, ItemDto itemDto) {
 
         User userDB = userService.getUser(userId);
-        Item itemDB = itemRepository.findById(userId)
+        Item itemDB = itemRepository.findById(itemId)
                 .orElseThrow(() -> new DataNotFoundException("Item not found"));
         if (!itemDB.getOwner().equals(userDB)) {
             throw new DataNotFoundException("The item can only be changed by the owner");
