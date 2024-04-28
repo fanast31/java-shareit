@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 @Table(name = "items", schema = "public")
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class Item {
 
     @Id

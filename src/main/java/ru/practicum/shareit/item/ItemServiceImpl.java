@@ -31,10 +31,8 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto update(long userId, long itemId, ItemDto itemDto) {
 
         User userDB = userService.getUser(userId);
-        Item itemDB = itemRepository.findById(itemId);
-        if (itemDB == null) {
-            throw new DataNotFoundException("Item not found");
-        }
+        Item itemDB = itemRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("Item not found"));
         if (!itemDB.getOwner().equals(userDB)) {
             throw new DataNotFoundException("The item can only be changed by the owner");
         }
@@ -55,19 +53,21 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto get(long itemId) {
-        return ItemMapper.toItemDto(itemRepository.findById(itemId));
+        return ItemMapper.toItemDto(itemRepository.findById(itemId)
+                .orElseThrow(() -> new DataNotFoundException("Item not found")));
     }
 
     @Override
     public List<ItemDto> getAll(long userId) {
-        return itemRepository.getAll(userId).stream()
+        return itemRepository.findAllByOwnerId(userId).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void delete(long itemId) {
-        itemRepository.delete(itemId);
+        itemRepository.delete(itemRepository.findById(itemId)
+                .orElseThrow(() -> new DataNotFoundException("Item not found")));
     }
 
     @Override
