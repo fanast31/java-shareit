@@ -2,7 +2,7 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -28,16 +28,18 @@ public class Item {
     @NotBlank
     private String description;
 
-    @Column(nullable = false)
+    @Column(name = "is_available", nullable = false)
     @NotNull
     private Boolean available;
 
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "owner_id")
     @ManyToOne(fetch = FetchType.LAZY)
     @ToString.Exclude
     private User owner;
 
-    //private ItemRequest request;
+    @JoinColumn(name = "request_id")
+    @ToString.Exclude
+    private ItemRequest request;
 
     public Item(String name, String description, Boolean available) {
         this.name = name;
@@ -45,4 +47,6 @@ public class Item {
         this.available = available;
     }
 
+    public static class Comment {
+    }
 }

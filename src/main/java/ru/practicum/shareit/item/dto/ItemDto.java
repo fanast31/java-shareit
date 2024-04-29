@@ -21,4 +21,6 @@ public class ItemDto {
     @NotNull
     private Boolean available;
 
+    public static class CommentDto {
+    }
 }
