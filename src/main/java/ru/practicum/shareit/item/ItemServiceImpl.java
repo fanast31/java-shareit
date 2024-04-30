@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
@@ -52,12 +53,20 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto get(long itemId) {
-        return ItemMapper.toItemDto(itemRepository.findById(itemId)
-                .orElseThrow(() -> new DataNotFoundException("Item not found")));
+    @Transactional(readOnly = true)
+    public Item getItem(long itemId) {
+        return itemRepository.findById(itemId)
+                .orElseThrow(() -> new DataNotFoundException("Item not found"));
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public ItemDto getItemDto(long itemId) {
+        return ItemMapper.toItemDto(getItem(itemId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<ItemDto> getAll(long userId) {
         return itemRepository.findAllByOwnerId(userId).stream()
                 .map(ItemMapper::toItemDto)
@@ -65,12 +74,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public void delete(long itemId) {
-        itemRepository.delete(itemRepository.findById(itemId)
-                .orElseThrow(() -> new DataNotFoundException("Item not found")));
-    }
-
-    @Override
+    @Transactional(readOnly = true)
     public List<ItemDto> searchByText(String searchText) {
         return itemRepository.searchByText(searchText).stream()
                 .map(ItemMapper::toItemDto)

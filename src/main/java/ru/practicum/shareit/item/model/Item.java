@@ -47,6 +47,4 @@ public class Item {
         this.available = available;
     }
 
-    public static class Comment {
-    }
 }

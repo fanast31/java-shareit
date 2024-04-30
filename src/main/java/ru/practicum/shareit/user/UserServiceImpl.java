@@ -2,6 +2,7 @@ package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -39,18 +40,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public User getUser(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("User not found"));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDto getUserDto(long userId) {
         return UserMapper.toUserDto(userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("User not found")));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserDto> getAll() {
         return userRepository.findAll().stream()
                         .map(UserMapper::toUserDto)
