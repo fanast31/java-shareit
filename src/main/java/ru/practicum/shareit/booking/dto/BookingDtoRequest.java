@@ -23,4 +23,9 @@ public class BookingDtoRequest {
         return end != null && start != null && start.isBefore(end);
     }
 
+    @AssertTrue(message = "Now should be before start")
+    public boolean isNowBeforeStart() {
+        return start != null && LocalDateTime.now().isBefore(start);
+    }
+
 }

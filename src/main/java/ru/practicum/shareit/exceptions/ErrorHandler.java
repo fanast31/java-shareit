@@ -17,8 +17,14 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse allException(final MethodArgumentNotValidException e) {
+    public ErrorResponse methodArgumentNotValidException(final MethodArgumentNotValidException e) {
         return new ErrorResponse("MethodArgumentNotValidException", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse badRequestException_400(final BadRequestException_400 e) {
+        return new ErrorResponse("BadRequestException_400", e.getMessage());
     }
 
     @ExceptionHandler

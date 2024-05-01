@@ -4,7 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingStatus;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
@@ -21,5 +23,13 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "LEFT JOIN FETCH item.owner itemOwner " +
             "WHERE booking.id = :bookingId AND itemOwner.id = :userId")
     Optional<Booking> bookingForUpdate(@Param("bookingId") Long bookingId, @Param("userId") Long userId);
+
+    List<Booking> findByBookerId(Long bookerId);
+
+    List<Booking> findByBookerIdAndStatus(Long bookerId, BookingStatus status);
+
+    List<Booking> findByItem_Owner_Id(Long itemOwnerId);
+
+    List<Booking> findByItem_Owner_IdAndStatus(Long itemOwnerId, BookingStatus status);
 
 }
