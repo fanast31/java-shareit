@@ -14,7 +14,7 @@ public class BookingMapper {
         if (booking == null) {
             return null;
         }
-        return new BookingDtoResponse(
+        BookingDtoResponse bookingDtoResponse = new BookingDtoResponse(
                 booking.getId(),
                 booking.getStart(),
                 booking.getEnd(),
@@ -22,6 +22,7 @@ public class BookingMapper {
                 booking.getBooker(),
                 booking.getStatus()
         );
+        return bookingDtoResponse;
     }
 
     public static Booking toBooking(BookingDtoRequest bookingDtoRequest) {

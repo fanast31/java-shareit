@@ -1,7 +1,6 @@
 package ru.practicum.shareit.booking.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.AssertTrue;
@@ -9,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class BookingDtoRequest {
 
     @NotNull
@@ -20,7 +20,7 @@ public class BookingDtoRequest {
     @NotNull
     private LocalDateTime end;
 
-    @AssertTrue(message = "Start should be after end")
+    @AssertTrue(message = "Start should be before end")
     public boolean isStartBeforeEnd() {
         return start.isBefore(end);
     }

@@ -2,7 +2,7 @@
 --DROP TABLE IF EXISTS users;
 --DROP TABLE IF EXISTS items;
 --DROP TABLE IF EXISTS requests;
---DROP TABLE IF EXISTS bookings;
+DROP TABLE IF EXISTS bookings;
 --DROP TABLE IF EXISTS comments;
 
 CREATE TABLE IF NOT EXISTS users (
@@ -12,6 +12,17 @@ CREATE TABLE IF NOT EXISTS users (
     email varchar(512) NOT NULL,
 
     CONSTRAINT uq_user_email UNIQUE (email)
+
+);
+
+CREATE TABLE IF NOT EXISTS requests (
+
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
+    description varchar(255) NOT NULL,
+    requester_id BIGINT,
+    created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+
+    CONSTRAINT fk_requests_to_users FOREIGN KEY(requester_id) REFERENCES users(id)
 
 );
 
@@ -26,17 +37,6 @@ CREATE TABLE IF NOT EXISTS items (
 
     CONSTRAINT fk_items_to_users FOREIGN KEY(owner_id) REFERENCES users(id),
     CONSTRAINT fk_items_to_requests FOREIGN KEY(request_id) REFERENCES requests(id)
-
-);
-
-CREATE TABLE IF NOT EXISTS requests (
-
-    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
-    description varchar(255) NOT NULL,
-    requester_id BIGINT,
-    created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-
-    CONSTRAINT fk_requests_to_users FOREIGN KEY(requester_id) REFERENCES users(id)
 
 );
 

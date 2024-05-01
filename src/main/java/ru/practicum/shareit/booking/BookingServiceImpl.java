@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
@@ -36,10 +37,27 @@ public class BookingServiceImpl implements BookingService{
         booking.setItem(item);
         booking.setBooker(booker);
 
-        bookingRepository.save(booking);
+        Long bookingId = bookingRepository.save(booking).getId();
+        return BookingMapper.toBookingDtoResponse(bookingRepository.bookingForView(userId, bookingId)
+                .orElseThrow(() -> new DataNotFoundException("Booking not found or not access for update")));
 
-        return BookingMapper.toBookingDtoResponse(booking);
     }
+    /*        Hibernate.initialize(item.getOwner());
+            Hibernate.initialize(item.getRequest());
+
+    //
+    //        return BookingMapper.toBookingDtoResponse(bookingRepository.bookingForView(userId, bookingId)
+    //                .orElseThrow(() -> new DataNotFoundException("Booking not found or not access for update")));
+            Booking savedBooking = bookingRepository.save(booking);
+            bookingRepository.flush();
+
+            Hibernate.initialize(savedBooking.getItem());
+            Hibernate.initialize(savedBooking.getItem().getOwner());
+            Hibernate.initialize(savedBooking.getItem().getRequest());
+            //Hibernate.initialize(booking.getItem().getRequest().getRequester());
+            Hibernate.initialize(savedBooking.getBooker());
+
+            return BookingMapper.toBookingDtoResponse(savedBooking);*/
 
     @Override
     public BookingDtoResponse updateBookingStatus(long bookingId, long userId, boolean approved) {
@@ -53,9 +71,7 @@ public class BookingServiceImpl implements BookingService{
             booking.setStatus(BookingStatus.REJECTED);
         }
 
-        bookingRepository.save(booking);
-
-        return BookingMapper.toBookingDtoResponse(booking);
+        return BookingMapper.toBookingDtoResponse(bookingRepository.save(booking));
     }
 
     @Override

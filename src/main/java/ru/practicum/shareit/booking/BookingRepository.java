@@ -12,6 +12,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT booking FROM Booking booking " +
             "LEFT JOIN FETCH booking.item item " +
             "LEFT JOIN FETCH item.owner itemOwner " +
+            "LEFT JOIN FETCH item.request request " +
+            "LEFT JOIN FETCH request.requester " +
             "LEFT JOIN FETCH booking.booker booker " +
             "WHERE booking.id = :bookingId AND (itemOwner.id = :userId OR booker.id = :userId)")
     Optional<Booking> bookingForView(@Param("bookingId") Long bookingId, @Param("userId") Long userId);
@@ -19,6 +21,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT booking FROM Booking booking " +
             "LEFT JOIN FETCH booking.item item " +
             "LEFT JOIN FETCH item.owner itemOwner " +
+            "LEFT JOIN FETCH item.request request " +
+            "LEFT JOIN FETCH request.requester " +
+            "LEFT JOIN FETCH booking.booker " +
             "WHERE booking.id = :bookingId AND itemOwner.id = :userId")
     Optional<Booking> bookingForUpdate(@Param("bookingId") Long bookingId, @Param("userId") Long userId);
 
