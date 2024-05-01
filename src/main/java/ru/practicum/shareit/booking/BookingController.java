@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.model.BookingState;
+import ru.practicum.shareit.exceptions.UnsupportedStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -43,15 +44,27 @@ public class BookingController {
     @GetMapping
     public ResponseEntity<List<BookingDtoResponse>> getBookingsForCurrentBooker(
             @RequestHeader("X-Sharer-User-Id") long userId,
-            @RequestParam(required = false, defaultValue = "ALL") BookingState state) {
-        return ResponseEntity.ok().body(bookingService.getBookingsForCurrentBooker(userId, state));
+            @Valid @RequestParam(required = false, defaultValue = "ALL") String state) {
+        BookingState bookingState;
+        try {
+            bookingState = BookingState.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            throw new UnsupportedStatusException(e.getMessage());
+        }
+        return ResponseEntity.ok().body(bookingService.getBookingsForCurrentBooker(userId, bookingState));
     }
 
     @GetMapping("/owner")
     public ResponseEntity<List<BookingDtoResponse>> getBookingsForAllItemsCurrentUser(
             @RequestHeader("X-Sharer-User-Id") long userId,
-            @RequestParam(required = false, defaultValue = "ALL") BookingState state) {
-        return ResponseEntity.ok().body(bookingService.getBookingsForAllItemsWhereOwnerIsCurrentUser(userId, state));
+            @Valid @RequestParam(required = false, defaultValue = "ALL") String state) {
+        BookingState bookingState;
+        try {
+            bookingState = BookingState.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            throw new UnsupportedStatusException(e.getMessage());
+        }
+        return ResponseEntity.ok().body(bookingService.getBookingsForAllItemsWhereOwnerIsCurrentUser(userId, bookingState));
     }
 
 }

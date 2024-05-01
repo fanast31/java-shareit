@@ -6,10 +6,12 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDtoRequest;
 import ru.practicum.shareit.item.dto.ItemDtoResponse;
+import ru.practicum.shareit.item.dto.ItemDtoResponseWithBookingDates;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,15 +71,19 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public ItemDtoResponse getItemDtoResponse(long itemId) {
-        return ItemMapper.toItemDtoResponse(getItem(itemId));
+    public ItemDtoResponseWithBookingDates getItemDtoResponse(long itemId) {
+        LocalDateTime now = LocalDateTime.now();
+        return ItemMapper.toItemDtoResponseWithBookingDates(
+                itemRepository.findItemWithDatesByOwnerId(itemId, now)
+                        .orElseThrow(() -> new DataNotFoundException("Item not found")));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDtoResponse> getAll(long userId) {
-        return itemRepository.findAllByOwnerId(userId).stream()
-                .map(ItemMapper::toItemDtoResponse)
+    public List<ItemDtoResponseWithBookingDates> getAll(long userId) {
+        LocalDateTime now = LocalDateTime.now();
+        return itemRepository.findAllItemWithDatesByOwnerId(userId, now).stream()
+                .map(ItemMapper::toItemDtoResponseWithBookingDates)
                 .collect(Collectors.toList());
     }
 

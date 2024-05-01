@@ -40,6 +40,9 @@ public class BookingServiceImpl implements BookingService{
             throw new BadRequestException_400("item.available = false");
         }
         User booker = userService.getUser(userId);
+        if (item.getOwner().equals(booker)) {
+            throw new DataNotFoundException("booker = owner");
+        }
 
         booking.setItem(item);
         booking.setBooker(booker);
@@ -55,6 +58,9 @@ public class BookingServiceImpl implements BookingService{
                 .orElseThrow(() -> new DataNotFoundException("Booking not found or not access for update"));
 
         if (approved) {
+            if (booking.getStatus() == BookingStatus.APPROVED) {
+                throw new BadRequestException_400("Booking status is already APPROVED");
+            }
             booking.setStatus(BookingStatus.APPROVED);
         } else {
             booking.setStatus(BookingStatus.REJECTED);
@@ -83,22 +89,28 @@ public class BookingServiceImpl implements BookingService{
         switch (state) {
             case ALL:
                 list = bookingRepository.findByBookerId(userId);
+                break;
             case CURRENT:
                 list = bookingRepository.findByBookerId(userId).stream()
                         .filter(booking -> !now.isBefore(booking.getStart()) && !now.isAfter(booking.getEnd()))
                         .collect(Collectors.toList());
+                break;
             case PAST:
-                list = bookingRepository.findByBookerId(userId).stream()
-                        .filter(booking -> now.isBefore(booking.getStart()))
-                        .collect(Collectors.toList());
-            case FUTURE:
                 list = bookingRepository.findByBookerId(userId).stream()
                         .filter(booking -> now.isAfter(booking.getEnd()))
                         .collect(Collectors.toList());
+                break;
+            case FUTURE:
+                list = bookingRepository.findByBookerId(userId).stream()
+                        .filter(booking -> now.isBefore(booking.getStart()))
+                        .collect(Collectors.toList());
+                break;
             case WAITING:
                 list = bookingRepository.findByBookerIdAndStatus(userId, BookingStatus.WAITING);
+                break;
             case REJECTED:
                 list = bookingRepository.findByBookerIdAndStatus(userId, BookingStatus.REJECTED);
+                break;
         }
 
         if (list.isEmpty()) {
@@ -122,22 +134,28 @@ public class BookingServiceImpl implements BookingService{
         switch (state) {
             case ALL:
                 list = bookingRepository.findByItem_Owner_Id(userId);
+                break;
             case CURRENT:
                 list = bookingRepository.findByItem_Owner_Id(userId).stream()
                         .filter(booking -> !now.isBefore(booking.getStart()) && !now.isAfter(booking.getEnd()))
                         .collect(Collectors.toList());
+                break;
             case PAST:
-                list = bookingRepository.findByItem_Owner_Id(userId).stream()
-                        .filter(booking -> now.isBefore(booking.getStart()))
-                        .collect(Collectors.toList());
-            case FUTURE:
                 list = bookingRepository.findByItem_Owner_Id(userId).stream()
                         .filter(booking -> now.isAfter(booking.getEnd()))
                         .collect(Collectors.toList());
+                break;
+            case FUTURE:
+                list = bookingRepository.findByItem_Owner_Id(userId).stream()
+                        .filter(booking -> now.isBefore(booking.getStart()))
+                        .collect(Collectors.toList());
+                break;
             case WAITING:
                 list = bookingRepository.findByItem_Owner_IdAndStatus(userId, BookingStatus.WAITING);
+                break;
             case REJECTED:
                 list = bookingRepository.findByItem_Owner_IdAndStatus(userId, BookingStatus.REJECTED);
+                break;
         }
 
         if (list.isEmpty()) {

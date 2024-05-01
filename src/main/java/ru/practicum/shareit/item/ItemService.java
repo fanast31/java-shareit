@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import ru.practicum.shareit.item.dto.ItemDtoRequest;
 import ru.practicum.shareit.item.dto.ItemDtoResponse;
+import ru.practicum.shareit.item.dto.ItemDtoResponseWithBookingDates;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
@@ -14,9 +15,9 @@ public interface ItemService {
 
     Item getItem(long itemId);
 
-    ItemDtoResponse getItemDtoResponse(long itemId);
+    ItemDtoResponseWithBookingDates getItemDtoResponse(long itemId);
 
-    List<ItemDtoResponse> getAll(long userId);
+    List<ItemDtoResponseWithBookingDates> getAll(long userId);
 
     List<ItemDtoResponse> searchByText(String searchText);
 
