@@ -1,31 +1,32 @@
 package ru.practicum.shareit.item;
 
 import lombok.*;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoRequest;
+import ru.practicum.shareit.item.dto.ItemDtoResponse;
 import ru.practicum.shareit.item.model.Item;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemMapper {
-    public static ItemDto toItemDto(Item item) {
+    public static ItemDtoResponse toItemDtoResponse(Item item) {
         if (item == null) {
             return null;
         }
-        return new ItemDto(
-                item.getId(),
-                item.getName(),
-                item.getDescription(),
-                item.getAvailable()
-        );
+        return ItemDtoResponse.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+                .build();
     }
 
-    public static Item toItem(ItemDto itemDto) {
-        if (itemDto == null) {
+    public static Item toItem(ItemDtoRequest itemDtoRequest) {
+        if (itemDtoRequest == null) {
             return null;
         }
-        return new Item(
-                itemDto.getName(),
-                itemDto.getDescription(),
-                itemDto.getAvailable()
-        );
+        return Item.builder()
+                .name(itemDtoRequest.getName())
+                .description(itemDtoRequest.getDescription())
+                .available(itemDtoRequest.getAvailable())
+                .build();
     }
 }

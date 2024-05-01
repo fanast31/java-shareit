@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserDtoRequest;
+import ru.practicum.shareit.user.dto.UserDtoResponse;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
@@ -17,17 +18,17 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDto create(UserDto userDto) {
-        return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
+    public UserDtoResponse create(UserDtoRequest userDtoRequest) {
+        return UserMapper.toUserDtoResponse(userRepository.save(UserMapper.toUser(userDtoRequest)));
     }
 
     @Override
-    public UserDto update(long userId, UserDto userDto) {
+    public UserDtoResponse update(long userId, UserDtoRequest userDtoRequest) {
 
         User userDB = userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("User not found"));
 
-        User user = UserMapper.toUser(userDto);
+        User user = UserMapper.toUser(userDtoRequest);
         user.setId(userDB.getId());
         if (user.getName() == null) {
             user.setName(userDB.getName());
@@ -36,7 +37,7 @@ public class UserServiceImpl implements UserService {
             user.setEmail(userDB.getEmail());
         }
 
-        return UserMapper.toUserDto(userRepository.save(user));
+        return UserMapper.toUserDtoResponse(userRepository.save(user));
     }
 
     @Override
@@ -48,15 +49,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDto getUserDto(long userId) {
-        return UserMapper.toUserDto(getUser(userId));
+    public UserDtoResponse getUserDtoResponse(long userId) {
+        return UserMapper.toUserDtoResponse(getUser(userId));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserDto> getAll() {
+    public List<UserDtoResponse> getAll() {
         return userRepository.findAll().stream()
-                        .map(UserMapper::toUserDto)
+                        .map(UserMapper::toUserDtoResponse)
                         .collect(Collectors.toList());
     }
 

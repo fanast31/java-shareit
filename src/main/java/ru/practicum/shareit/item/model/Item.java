@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "items", schema = "public")
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Item {
@@ -41,11 +42,5 @@ public class Item {
     @OneToOne
     @ToString.Exclude
     private ItemRequest request;
-
-    public Item(String name, String description, Boolean available) {
-        this.name = name;
-        this.description = description;
-        this.available = available;
-    }
 
 }

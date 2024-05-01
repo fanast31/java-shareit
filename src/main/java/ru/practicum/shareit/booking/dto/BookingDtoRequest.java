@@ -7,8 +7,6 @@ import javax.validation.constraints.AssertTrue;
 import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class BookingDtoRequest {
 
     @NotNull
@@ -22,7 +20,7 @@ public class BookingDtoRequest {
 
     @AssertTrue(message = "Start should be before end")
     public boolean isStartBeforeEnd() {
-        return start.isBefore(end);
+        return end != null && start != null && start.isBefore(end);
     }
 
 }

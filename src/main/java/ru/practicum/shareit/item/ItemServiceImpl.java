@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoRequest;
+import ru.practicum.shareit.item.dto.ItemDtoResponse;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.model.User;
@@ -21,15 +22,15 @@ public class ItemServiceImpl implements ItemService {
     private final UserService userService;
 
     @Override
-    public ItemDto create(long userId, ItemDto itemDto) {
+    public ItemDtoResponse create(long userId, ItemDtoRequest itemDtoRequest) {
         User user = userService.getUser(userId);
-        Item item = ItemMapper.toItem(itemDto);
+        Item item = ItemMapper.toItem(itemDtoRequest);
         item.setOwner(user);
-        return ItemMapper.toItemDto(itemRepository.save(item));
+        return ItemMapper.toItemDtoResponse(itemRepository.save(item));
     }
 
     @Override
-    public ItemDto update(long userId, long itemId, ItemDto itemDto) {
+    public ItemDtoResponse update(long userId, long itemId, ItemDtoRequest itemDtoRequest) {
 
         User userDB = userService.getUser(userId);
         Item itemDB = itemRepository.findById(itemId)
@@ -38,18 +39,25 @@ public class ItemServiceImpl implements ItemService {
             throw new DataNotFoundException("The item can only be changed by the owner");
         }
 
-        if (itemDto.getName() != null) {
-            itemDB.setName(itemDto.getName());
+        boolean changed = false;
+        if (itemDtoRequest.getName() != null) {
+            itemDB.setName(itemDtoRequest.getName());
+            changed = true;
         }
-        if (itemDto.getDescription() != null) {
-            itemDB.setDescription(itemDto.getDescription());
+        if (itemDtoRequest.getDescription() != null) {
+            itemDB.setDescription(itemDtoRequest.getDescription());
+            changed = true;
         }
-        if (itemDto.getAvailable() != null) {
-            itemDB.setAvailable(itemDto.getAvailable());
+        if (itemDtoRequest.getAvailable() != null) {
+            itemDB.setAvailable(itemDtoRequest.getAvailable());
+            changed = true;
         }
 
-        itemRepository.save(itemDB);
-        return ItemMapper.toItemDto(itemDB);
+        if (changed) {
+            itemRepository.save(itemDB);
+        }
+
+        return ItemMapper.toItemDtoResponse(itemDB);
     }
 
     @Override
@@ -61,23 +69,23 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public ItemDto getItemDto(long itemId) {
-        return ItemMapper.toItemDto(getItem(itemId));
+    public ItemDtoResponse getItemDtoResponse(long itemId) {
+        return ItemMapper.toItemDtoResponse(getItem(itemId));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> getAll(long userId) {
+    public List<ItemDtoResponse> getAll(long userId) {
         return itemRepository.findAllByOwnerId(userId).stream()
-                .map(ItemMapper::toItemDto)
+                .map(ItemMapper::toItemDtoResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> searchByText(String searchText) {
+    public List<ItemDtoResponse> searchByText(String searchText) {
         return itemRepository.searchByText(searchText).stream()
-                .map(ItemMapper::toItemDto)
+                .map(ItemMapper::toItemDtoResponse)
                 .collect(Collectors.toList());
     }
 }

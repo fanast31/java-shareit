@@ -8,6 +8,7 @@ import javax.validation.constraints.*;
 @Entity
 @Table(name = "users", schema = "public")
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
@@ -25,8 +26,4 @@ public class User {
     @NotEmpty
     private String email;
 
-    public User(String name, String email) {
-        this.name = name;
-        this.email = email;
-    }
 }

@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.user.UserMapper;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookingMapper {
@@ -14,15 +16,15 @@ public class BookingMapper {
         if (booking == null) {
             return null;
         }
-        BookingDtoResponse bookingDtoResponse = new BookingDtoResponse(
-                booking.getId(),
-                booking.getStart(),
-                booking.getEnd(),
-                booking.getItem(),
-                booking.getBooker(),
-                booking.getStatus()
-        );
-        return bookingDtoResponse;
+        return BookingDtoResponse.builder()
+                .id(booking.getId())
+                .start(booking.getStart())
+                .end(booking.getEnd())
+                .item(ItemMapper.toItemDtoResponse(booking.getItem()))
+                .booker(UserMapper.toUserDtoResponse(booking.getBooker()))
+                .status(booking.getStatus())
+                .build();
+
     }
 
     public static Booking toBooking(BookingDtoRequest bookingDtoRequest) {
