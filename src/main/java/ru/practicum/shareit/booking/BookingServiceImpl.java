@@ -44,6 +44,7 @@ public class BookingServiceImpl implements BookingService{
     }
     /*        Hibernate.initialize(item.getOwner());
             Hibernate.initialize(item.getRequest());
+    //    Long bookingId = bookingRepository.save(booking).getId();
 
     //
     //        return BookingMapper.toBookingDtoResponse(bookingRepository.bookingForView(userId, bookingId)
