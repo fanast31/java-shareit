@@ -8,7 +8,7 @@ import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.exceptions.BadRequestException_400;
+import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
@@ -39,7 +39,7 @@ public class BookingServiceImpl implements BookingService {
         Item item = itemRepository.findById(bookingDtoRequest.getItemId())
                 .orElseThrow(() -> new DataNotFoundException("Item not found"));
         if (!item.getAvailable()) {
-            throw new BadRequestException_400("item.available = false");
+            throw new BadRequestException("item.available = false");
         }
         User booker = userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("User not found"));
@@ -62,7 +62,7 @@ public class BookingServiceImpl implements BookingService {
 
         if (approved) {
             if (booking.getStatus() == BookingStatus.APPROVED) {
-                throw new BadRequestException_400("Booking status is already APPROVED");
+                throw new BadRequestException("Booking status is already APPROVED");
             }
             booking.setStatus(BookingStatus.APPROVED);
         } else {

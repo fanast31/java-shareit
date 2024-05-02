@@ -23,7 +23,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse badRequestException_400(final BadRequestException_400 e) {
+    public ErrorResponse badRequestException_400(final BadRequestException e) {
         return new ErrorResponse("BadRequestException_400", e.getMessage());
     }
 

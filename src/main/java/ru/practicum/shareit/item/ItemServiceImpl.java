@@ -7,7 +7,7 @@ import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.exceptions.BadRequestException_400;
+import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
@@ -51,7 +51,7 @@ public class ItemServiceImpl implements ItemService {
 
         LocalDateTime now = LocalDateTime.now();
         if (bookingRepository.findAllByItemAndBooker(item, user).stream().noneMatch(b -> b.isFinished(now))) {
-            throw new BadRequestException_400("No finished bookings for this user and thi item were found");
+            throw new BadRequestException("No finished bookings for this user and thi item were found");
         }
         ;
 
@@ -107,7 +107,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     public ItemDtoResponseWithBookingDates getItemDtoResponse(long itemId, long userId) {
         return itemRepository.findById(itemId)
-                .map(item -> AddNecessaryFields(item, userId))
+                .map(item -> addNecessaryFields(item, userId))
                 .orElseThrow(() -> new DataNotFoundException("Item not found"));
     }
 
@@ -115,11 +115,11 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     public List<ItemDtoResponseWithBookingDates> getAll(long userId) {
         return itemRepository.findAllByOwnerId(userId).stream()
-                .map(item -> AddNecessaryFields(item, userId))
+                .map(item -> addNecessaryFields(item, userId))
                 .collect(Collectors.toList());
     }
 
-    private ItemDtoResponseWithBookingDates AddNecessaryFields(Item item, Long userId) {
+    private ItemDtoResponseWithBookingDates addNecessaryFields(Item item, Long userId) {
 
         ItemDtoResponseWithBookingDates newItem = ItemMapper.toItemDtoResponseWithBookingDates(item);
 
