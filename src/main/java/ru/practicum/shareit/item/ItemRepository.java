@@ -18,34 +18,34 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "AND i.available = true")
     List<Item> searchByText(@Param("searchText") String searchText);
 
-    @Query("SELECT " +
-            "i.id AS id, " +
-            "i.name AS name, " +
-            "i.description AS description, " +
-            "i.available AS available, " +
-            "MAX(b_Min.start) AS lastBookingDate, " +
-            "MIN(b_Max.start) AS nextBookingDate " +
-            "   FROM Item i " +
-            "       LEFT JOIN Booking b_Min ON b_Min.item = i AND b_Min.start < :now " +
-            "       LEFT JOIN Booking b_Max ON b_Max.item = i AND b_Max.start >= :now " +
-            "       LEFT JOIN i.owner o" +
-            "   WHERE o.id = :userId " +
-            "GROUP BY i.id, i.name, i.description, i.available")
-    List<ItemDtoResponseWithBookingDates> findAllItemWithDatesByOwnerId(Long userId, LocalDateTime now);
-
-    @Query("SELECT " +
-            "i.id AS id, " +
-            "i.name AS name, " +
-            "i.description AS description, " +
-            "i.available AS available, " +
-            "MAX(b_Min.start) AS lastBookingDate, " +
-            "MIN(b_Max.start) AS nextBookingDate " +
-            "   FROM Item i " +
-            "       LEFT JOIN Booking b_Min ON b_Min.item = i AND b_Min.start < :now " +
-            "       LEFT JOIN Booking b_Max ON b_Max.item = i AND b_Max.start >= :now " +
-            "   WHERE i.id = :itemId " +
-            "GROUP BY i.id, i.name, i.description, i.available")
-    Optional<ItemDtoResponseWithBookingDates> findItemWithDatesByItemId(Long itemId, LocalDateTime now);
+//    @Query("SELECT " +
+//            "i.id AS id, " +
+//            "i.name AS name, " +
+//            "i.description AS description, " +
+//            "i.available AS available, " +
+//            "MAX(b_Min.start) AS lastBookingDate, " +
+//            "MIN(b_Max.start) AS nextBookingDate " +
+//            "   FROM Item i " +
+//            "       LEFT JOIN Booking b_Min ON b_Min.item = i AND b_Min.start < :now " +
+//            "       LEFT JOIN Booking b_Max ON b_Max.item = i AND b_Max.start >= :now " +
+//            "       LEFT JOIN i.owner o" +
+//            "   WHERE o.id = :userId " +
+//            "GROUP BY i.id, i.name, i.description, i.available")
+//    List<ItemDtoResponseWithBookingDates> findAllItemWithDatesByOwnerId(Long userId, LocalDateTime now);
+//
+//    @Query("SELECT " +
+//            "i.id AS id, " +
+//            "i.name AS name, " +
+//            "i.description AS description, " +
+//            "i.available AS available, " +
+//            "MAX(b_Min.start) AS lastBookingDate, " +
+//            "MIN(b_Max.start) AS nextBookingDate " +
+//            "   FROM Item i " +
+//            "       LEFT JOIN Booking b_Min ON b_Min.item = i AND b_Min.start < :now " +
+//            "       LEFT JOIN Booking b_Max ON b_Max.item = i AND b_Max.start >= :now " +
+//            "   WHERE i.id = :itemId " +
+//            "GROUP BY i.id, i.name, i.description, i.available")
+//    Optional<ItemDtoResponseWithBookingDates> findItemWithDatesByItemId(Long itemId, LocalDateTime now);
 
 }
 
