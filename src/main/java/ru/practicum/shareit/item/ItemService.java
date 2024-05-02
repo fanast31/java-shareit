@@ -15,7 +15,7 @@ public interface ItemService {
 
     Item getItem(long itemId);
 
-    ItemDtoResponseWithBookingDates getItemDtoResponse(long itemId);
+    ItemDtoResponseWithBookingDates getItemDtoResponse(long itemId, long userId);
 
     List<ItemDtoResponseWithBookingDates> getAll(long userId);
 

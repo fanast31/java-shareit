@@ -36,8 +36,9 @@ public class ItemController {
 
     @GetMapping("/{itemId}")
     public ResponseEntity<ItemDtoResponseWithBookingDates> get(
+            @RequestHeader("X-Sharer-User-Id") long userId,
             @PathVariable long itemId) {
-        return ResponseEntity.ok().body(itemService.getItemDtoResponse(itemId));
+        return ResponseEntity.ok().body(itemService.getItemDtoResponse(itemId, userId));
     }
 
     @GetMapping

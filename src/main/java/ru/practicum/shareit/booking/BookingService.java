@@ -22,8 +22,4 @@ public interface BookingService {
 
     List<BookingDtoResponse> getBookingsForAllItemsWhereOwnerIsCurrentUser(long userId, BookingState state);
 
-    Optional<Booking> findFirstMaxFromPast(Item item, LocalDateTime start);
-
-    Optional<Booking> findFirstMinFromFuture(Item item, LocalDateTime start);
-
 }

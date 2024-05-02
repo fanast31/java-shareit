@@ -169,13 +169,4 @@ public class BookingServiceImpl implements BookingService{
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public Optional<Booking> findFirstMaxFromPast(Item item, LocalDateTime start) {
-        return bookingRepository.findFirstByItemAndStartBeforeOrderByStartDesc(item, start);
-    }
-
-    @Override
-    public Optional<Booking> findFirstMinFromFuture(Item item, LocalDateTime start) {
-        return bookingRepository.findFirstByItemAndStartAfterOrderByStart(item, start);
-    }
 }

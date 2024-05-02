@@ -2,7 +2,7 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.booking.dto.BookingDtoResponse;
+import ru.practicum.shareit.booking.dto.BookingDtoResponseForItem;
 
 @Data
 @Builder
@@ -16,8 +16,8 @@ public class ItemDtoResponseWithBookingDates {
 
     private Boolean available;
 
-    private BookingDtoResponse lastBooking;
+    private BookingDtoResponseForItem lastBooking;
 
-    private BookingDtoResponse nextBooking;
+    private BookingDtoResponseForItem nextBooking;
 
 }
