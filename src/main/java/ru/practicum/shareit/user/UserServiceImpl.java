@@ -57,8 +57,8 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public List<UserDtoResponse> getAll() {
         return userRepository.findAll().stream()
-                        .map(UserMapper::toUserDtoResponse)
-                        .collect(Collectors.toList());
+                .map(UserMapper::toUserDtoResponse)
+                .collect(Collectors.toList());
     }
 
     @Override

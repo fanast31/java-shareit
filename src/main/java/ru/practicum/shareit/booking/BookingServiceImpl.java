@@ -10,25 +10,25 @@ import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.exceptions.BadRequestException_400;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
-import ru.practicum.shareit.item.ItemService;
+import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
+
 import java.time.LocalDateTime;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class BookingServiceImpl implements BookingService{
+public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
-    private final UserService userService;
-    private final ItemService itemService;
+    private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
 
     @Override
     @Transactional
@@ -36,11 +36,13 @@ public class BookingServiceImpl implements BookingService{
 
         Booking booking = BookingMapper.toBooking(bookingDtoRequest);
 
-        Item item = itemService.getItem(bookingDtoRequest.getItemId());
+        Item item = itemRepository.findById(bookingDtoRequest.getItemId())
+                .orElseThrow(() -> new DataNotFoundException("Item not found"));
         if (!item.getAvailable()) {
             throw new BadRequestException_400("item.available = false");
         }
-        User booker = userService.getUser(userId);
+        User booker = userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("User not found"));
         if (item.getOwner().equals(booker)) {
             throw new DataNotFoundException("booker = owner");
         }

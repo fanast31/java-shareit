@@ -1,15 +1,15 @@
 package ru.practicum.shareit.item;
 
-import ru.practicum.shareit.item.dto.ItemDtoRequest;
-import ru.practicum.shareit.item.dto.ItemDtoResponse;
-import ru.practicum.shareit.item.dto.ItemDtoResponseWithBookingDates;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
 public interface ItemService {
 
-    ItemDtoResponse create(long userId, ItemDtoRequest itemDtoRequest);
+    ItemDtoResponse createItem(long userId, ItemDtoRequest itemDtoRequest);
+
+    CommentDtoResponse createComment(long userId, long itemId, CommentDtoRequest commentDtoRequest);
 
     ItemDtoResponse update(long userId, long itemId, ItemDtoRequest itemDtoRequest);
 

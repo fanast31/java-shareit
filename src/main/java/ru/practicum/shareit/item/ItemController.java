@@ -4,9 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDtoRequest;
-import ru.practicum.shareit.item.dto.ItemDtoResponse;
-import ru.practicum.shareit.item.dto.ItemDtoResponseWithBookingDates;
+import ru.practicum.shareit.item.dto.*;
 
 import javax.validation.Valid;
 import java.util.Collections;
@@ -20,10 +18,10 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ResponseEntity<ItemDtoResponse> create(
+    public ResponseEntity<ItemDtoResponse> createItem(
             @RequestHeader("X-Sharer-User-Id") long userId,
             @Valid @RequestBody ItemDtoRequest itemDtoRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(itemService.create(userId, itemDtoRequest));
+        return ResponseEntity.status(HttpStatus.CREATED).body(itemService.createItem(userId, itemDtoRequest));
     }
 
     @PatchMapping("/{itemId}")
@@ -53,4 +51,13 @@ public class ItemController {
         }
         return ResponseEntity.ok(itemService.searchByText(searchText));
     }
+
+    @PostMapping("/{itemId}/comment")
+    public ResponseEntity<CommentDtoResponse> createComment(
+            @RequestHeader("X-Sharer-User-Id") long userId,
+            @PathVariable long itemId,
+            @Valid @RequestBody CommentDtoRequest commentDtoRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(itemService.createComment(userId, itemId, commentDtoRequest));
+    }
+
 }

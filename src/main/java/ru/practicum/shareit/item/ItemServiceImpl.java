@@ -5,14 +5,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
-import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.exceptions.BadRequestException_400;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
-import ru.practicum.shareit.item.dto.ItemDtoRequest;
-import ru.practicum.shareit.item.dto.ItemDtoResponse;
-import ru.practicum.shareit.item.dto.ItemDtoResponseWithBookingDates;
+import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
@@ -26,22 +26,49 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
 
-    private final UserService userService;
+    private final UserRepository userRepository;
 
-    private final BookingRepository bookingServiceRepository;
+    private final BookingRepository bookingRepository;
+
+    private final CommentRepository commentRepository;
 
     @Override
-    public ItemDtoResponse create(long userId, ItemDtoRequest itemDtoRequest) {
-        User user = userService.getUser(userId);
+    public ItemDtoResponse createItem(long userId, ItemDtoRequest itemDtoRequest) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("User not found"));
         Item item = ItemMapper.toItem(itemDtoRequest);
         item.setOwner(user);
         return ItemMapper.toItemDtoResponse(itemRepository.save(item));
     }
 
     @Override
+    public CommentDtoResponse createComment(long userId, long itemId, CommentDtoRequest commentDtoRequest) {
+
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new DataNotFoundException("Item not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("User not found"));
+
+        LocalDateTime now = LocalDateTime.now();
+        if (bookingRepository.findAllByItemAndBooker(item, user).stream().noneMatch(b -> b.isFinished(now))) {
+            throw new BadRequestException_400("No finished bookings for this user and thi item were found");
+        }
+        ;
+
+        Comment comment = CommentMapper.toComment(commentDtoRequest);
+        comment.setCreated(now);
+        comment.setItem(item);
+        comment.setAuthor(user);
+
+        return CommentMapper.toCommentDtoResponse(commentRepository.save(comment));
+
+    }
+
+    @Override
     public ItemDtoResponse update(long userId, long itemId, ItemDtoRequest itemDtoRequest) {
 
-        User userDB = userService.getUser(userId);
+        User userDB = userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("User not found"));
         Item itemDB = itemRepository.findById(itemId)
                 .orElseThrow(() -> new DataNotFoundException("Item not found"));
         if (!itemDB.getOwner().equals(userDB)) {
@@ -98,19 +125,21 @@ public class ItemServiceImpl implements ItemService {
 
         if (Objects.equals(item.getOwner().getId(), userId)) {
             LocalDateTime start = LocalDateTime.now();
-            final Booking lastBooking = bookingServiceRepository
-                    .findFirstByItemAndStartBeforeOrderByStartDesc(item, start)
+            final Booking lastBooking = bookingRepository
+                    .findFirstByItemAndStatusIsNotAndStartBeforeOrderByStartDesc(item, BookingStatus.REJECTED, start)
                     .orElse(null);
-            final Booking nextBooking = bookingServiceRepository
-                    .findFirstByItemAndStartAfterOrderByStart(item, start)
+            final Booking nextBooking = bookingRepository
+                    .findFirstByItemAndStatusIsNotAndStartAfterOrderByStart(item, BookingStatus.REJECTED, start)
                     .orElse(null);
 
             newItem.setLastBooking(BookingMapper.toBookingDtoResponseForItem(lastBooking));
             newItem.setNextBooking(BookingMapper.toBookingDtoResponseForItem(nextBooking));
         }
-//        item.setComments(commentRepository.findAllByItem(item).stream()
-//                        .map(mapper::to Item Comment)Stream < Item Comment >
-//                .collect(Collectors.toList()));
+
+        newItem.setComments(commentRepository.findAllByItem(item).stream()
+                .map(CommentMapper::toCommentDtoResponse)
+                .collect(Collectors.toList()));
+
         return newItem;
     }
 

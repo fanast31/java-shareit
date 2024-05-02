@@ -43,4 +43,8 @@ public class Booking {
         this.status = BookingStatus.WAITING;
     }
 
+    public boolean isFinished(LocalDateTime now) {
+        return getStatus() == BookingStatus.APPROVED && getEnd().isBefore(now);
+    }
+
 }
