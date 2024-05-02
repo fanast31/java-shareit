@@ -1,19 +1,23 @@
 package ru.practicum.shareit.item.dto;
 
+import lombok.Builder;
+import lombok.Data;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 
-public interface ItemDtoResponseWithBookingDates {
+@Data
+@Builder
+public class ItemDtoResponseWithBookingDates {
 
-    Long getId();
+    private Long id;
 
-    String getName();
+    private String name;
 
-    String getDescription();
+    private String description;
 
-    Boolean getAvailable();
+    private Boolean available;
 
-    BookingDtoResponse getLastBooking();
+    private BookingDtoResponse lastBooking;
 
-    BookingDtoResponse getNextBooking();
+    private BookingDtoResponse nextBooking;
 
 }

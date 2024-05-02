@@ -4,7 +4,6 @@ import lombok.*;
 import ru.practicum.shareit.item.dto.ItemDtoRequest;
 import ru.practicum.shareit.item.dto.ItemDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDtoResponseWithBookingDates;
-import ru.practicum.shareit.item.dto.ItemDtoResponseWithBookingDatesImpl;
 import ru.practicum.shareit.item.model.Item;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -25,7 +24,7 @@ public class ItemMapper {
         if (item == null) {
             return null;
         }
-        return ItemDtoResponseWithBookingDatesImpl.builder()
+        return ItemDtoResponseWithBookingDates.builder()
                 .id(item.getId())
                 .name(item.getName())
                 .nextBooking(item.getNextBooking())

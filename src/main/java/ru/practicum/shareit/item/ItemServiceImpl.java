@@ -74,7 +74,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDtoResponseWithBookingDates getItemDtoResponse(long itemId) {
         LocalDateTime now = LocalDateTime.now();
         return ItemMapper.toItemDtoResponseWithBookingDates(
-                itemRepository.findItemWithDatesByOwnerId(itemId, now)
+                itemRepository.findItemWithDatesByItemId(itemId, now)
                         .orElseThrow(() -> new DataNotFoundException("Item not found")));
     }
 
