@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -166,5 +167,15 @@ public class BookingServiceImpl implements BookingService{
                 .sorted(Comparator.comparing(Booking::getStart).reversed())
                 .map(BookingMapper::toBookingDtoResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<Booking> findFirstMaxFromPast(Item item, LocalDateTime start) {
+        return bookingRepository.findFirstByItemAndStartBeforeOrderByStartDesc(item, start);
+    }
+
+    @Override
+    public Optional<Booking> findFirstMinFromFuture(Item item, LocalDateTime start) {
+        return bookingRepository.findFirstByItemAndStartAfterOrderByStart(item, start);
     }
 }

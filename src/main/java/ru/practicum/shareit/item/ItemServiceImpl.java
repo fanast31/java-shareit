@@ -3,6 +3,9 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.BookingService;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDtoRequest;
 import ru.practicum.shareit.item.dto.ItemDtoResponse;
@@ -22,6 +25,8 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
 
     private final UserService userService;
+
+    private final BookingService bookingService;
 
     @Override
     public ItemDtoResponse create(long userId, ItemDtoRequest itemDtoRequest) {
@@ -72,18 +77,37 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public ItemDtoResponseWithBookingDates getItemDtoResponse(long itemId) {
-        LocalDateTime now = LocalDateTime.now();
-        return ItemMapper.toItemDtoResponseWithBookingDates(
-                itemRepository.findItemWithDatesByItemId(itemId, now)
-                        .orElseThrow(() -> new DataNotFoundException("Item not found")));
+        return itemRepository.findById(itemId)
+                .map(this::AddNecessaryFields)
+                .orElseThrow(() -> new DataNotFoundException("Item not found"));
+    }
+
+    private ItemDtoResponseWithBookingDates AddNecessaryFields(Item item) {
+
+        ItemDtoResponseWithBookingDates newItem = ItemMapper.toItemDtoResponseWithBookingDates(item);
+
+        LocalDateTime start = LocalDateTime.now();
+        final Booking lastBooking = bookingService
+                .findFirstMaxFromPast(item, start)
+                .orElse(null);
+        final Booking nextBooking = bookingService
+                .findFirstMinFromFuture(item, start)
+                .orElse(null);
+
+        newItem.setLastBooking(BookingMapper.toBookingDtoResponse(lastBooking));
+        newItem.setNextBooking(BookingMapper.toBookingDtoResponse(nextBooking));
+
+//        item.setComments(commentRepository.findAllByItem(item).stream()
+//                        .map(mapper::to Item Comment)Stream < Item Comment >
+//                .collect(Collectors.toList()));
+        return newItem;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ItemDtoResponseWithBookingDates> getAll(long userId) {
-        LocalDateTime now = LocalDateTime.now();
-        return itemRepository.findAllItemWithDatesByOwnerId(userId, now).stream()
-                .map(ItemMapper::toItemDtoResponseWithBookingDates)
+        return itemRepository.findAllByOwnerId(userId).stream()
+                .map(this::AddNecessaryFields)
                 .collect(Collectors.toList());
     }
 
@@ -94,4 +118,5 @@ public class ItemServiceImpl implements ItemService {
                 .map(ItemMapper::toItemDtoResponse)
                 .collect(Collectors.toList());
     }
+
 }

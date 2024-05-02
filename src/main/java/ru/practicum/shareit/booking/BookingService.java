@@ -2,9 +2,13 @@ package ru.practicum.shareit.booking;
 
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
+import ru.practicum.shareit.item.model.Item;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookingService {
 
@@ -17,5 +21,9 @@ public interface BookingService {
     List<BookingDtoResponse> getBookingsForCurrentBooker(long userId, BookingState state);
 
     List<BookingDtoResponse> getBookingsForAllItemsWhereOwnerIsCurrentUser(long userId, BookingState state);
+
+    Optional<Booking> findFirstMaxFromPast(Item item, LocalDateTime start);
+
+    Optional<Booking> findFirstMinFromFuture(Item item, LocalDateTime start);
 
 }

@@ -20,15 +20,13 @@ public class ItemMapper {
                 .build();
     }
 
-    public static ItemDtoResponseWithBookingDates toItemDtoResponseWithBookingDates(ItemDtoResponseWithBookingDates item) {
+    public static ItemDtoResponseWithBookingDates toItemDtoResponseWithBookingDates(Item item) {
         if (item == null) {
             return null;
         }
         return ItemDtoResponseWithBookingDates.builder()
                 .id(item.getId())
                 .name(item.getName())
-                .nextBooking(item.getNextBooking())
-                .lastBooking(item.getLastBooking())
                 .description(item.getDescription())
                 .available(item.getAvailable())
                 .build();
