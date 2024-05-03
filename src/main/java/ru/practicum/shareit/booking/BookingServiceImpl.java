@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
@@ -29,6 +30,8 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    public static final Sort SORT_START_DESC = Sort.by(Sort.Direction.DESC, "start");
+
 
     @Override
     @Transactional
@@ -91,22 +94,16 @@ public class BookingServiceImpl implements BookingService {
 
         switch (state) {
             case ALL:
-                list = bookingRepository.findByBookerId(userId);
+                list = bookingRepository.findByBookerId(userId, SORT_START_DESC);
                 break;
             case CURRENT:
-                list = bookingRepository.findByBookerId(userId).stream()
-                        .filter(booking -> !now.isBefore(booking.getStart()) && !now.isAfter(booking.getEnd()))
-                        .collect(Collectors.toList());
+                list = bookingRepository.findByBooker_IdAndStartIsBeforeAndEndIsAfter(userId, now, now, SORT_START_DESC);
                 break;
             case PAST:
-                list = bookingRepository.findByBookerId(userId).stream()
-                        .filter(booking -> now.isAfter(booking.getEnd()))
-                        .collect(Collectors.toList());
+                list = bookingRepository.findByBooker_IdAndEndIsBefore(userId, now, SORT_START_DESC);
                 break;
             case FUTURE:
-                list = bookingRepository.findByBookerId(userId).stream()
-                        .filter(booking -> now.isBefore(booking.getStart()))
-                        .collect(Collectors.toList());
+                list = bookingRepository.findByBooker_IdAndStartIsAfter(userId, now, SORT_START_DESC);
                 break;
             case WAITING:
                 list = bookingRepository.findByBookerIdAndStatus(userId, BookingStatus.WAITING);
@@ -121,7 +118,6 @@ public class BookingServiceImpl implements BookingService {
         }
 
         return list.stream()
-                .sorted(Comparator.comparing(Booking::getStart).reversed())
                 .map(BookingMapper::toBookingDtoResponse)
                 .collect(Collectors.toList());
 

@@ -33,6 +33,10 @@ public class ItemServiceImpl implements ItemService {
 
     private final CommentRepository commentRepository;
 
+    public static final Sort SORT_START_DESC = Sort.by(Sort.Direction.DESC, "start");
+
+    public static final Sort SORT_START_ASC = Sort.by(Sort.Direction.ASC, "start");
+
     @Override
     public ItemDtoResponse createItem(long userId, ItemDtoRequest itemDtoRequest) {
         User user = userRepository.findById(userId)
@@ -129,11 +133,11 @@ public class ItemServiceImpl implements ItemService {
 
             final Booking lastBooking = bookingRepository
                     .findFirstByItemAndStatusIsNotAndStartBefore(
-                            item, BookingStatus.REJECTED, start, Sort.by(Sort.Direction.DESC, "start"))
+                            item, BookingStatus.REJECTED, start, SORT_START_DESC)
                     .orElse(null);
             final Booking nextBooking = bookingRepository
                     .findFirstByItemAndStatusIsNotAndStartAfter(
-                            item, BookingStatus.REJECTED, start, Sort.by(Sort.Direction.ASC, "start"))
+                            item, BookingStatus.REJECTED, start, SORT_START_ASC)
                     .orElse(null);
 
             newItem.setLastBooking(BookingMapper.toBookingDtoResponseForItem(lastBooking));
