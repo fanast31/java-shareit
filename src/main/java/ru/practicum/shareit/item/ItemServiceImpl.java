@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingMapper;
@@ -125,11 +126,14 @@ public class ItemServiceImpl implements ItemService {
 
         if (Objects.equals(item.getOwner().getId(), userId)) {
             LocalDateTime start = LocalDateTime.now();
+
             final Booking lastBooking = bookingRepository
-                    .findFirstByItemAndStatusIsNotAndStartBeforeOrderByStartDesc(item, BookingStatus.REJECTED, start)
+                    .findFirstByItemAndStatusIsNotAndStartBefore(
+                            item, BookingStatus.REJECTED, start, Sort.by(Sort.Direction.DESC, "start"))
                     .orElse(null);
             final Booking nextBooking = bookingRepository
-                    .findFirstByItemAndStatusIsNotAndStartAfterOrderByStart(item, BookingStatus.REJECTED, start)
+                    .findFirstByItemAndStatusIsNotAndStartAfter(
+                            item, BookingStatus.REJECTED, start, Sort.by(Sort.Direction.ASC, "start"))
                     .orElse(null);
 
             newItem.setLastBooking(BookingMapper.toBookingDtoResponseForItem(lastBooking));

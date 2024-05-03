@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
@@ -14,18 +15,11 @@ import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    @Query("SELECT booking FROM Booking booking " +
-            "LEFT JOIN FETCH booking.item item " +
-            "LEFT JOIN FETCH item.owner itemOwner " +
-            "LEFT JOIN FETCH booking.booker booker " +
-            "WHERE booking.id = :bookingId AND (itemOwner.id = :userId OR booker.id = :userId)")
+    @Query("SELECT b FROM Booking b " +
+            "WHERE b.id = :bookingId AND (b.item.owner.id = :userId OR b.booker.id = :userId)")
     Optional<Booking> bookingForView(@Param("bookingId") Long bookingId, @Param("userId") Long userId);
 
-    @Query("SELECT booking FROM Booking booking " +
-            "LEFT JOIN FETCH booking.item item " +
-            "LEFT JOIN FETCH item.owner itemOwner " +
-            "WHERE booking.id = :bookingId AND itemOwner.id = :userId")
-    Optional<Booking> bookingForUpdate(@Param("bookingId") Long bookingId, @Param("userId") Long userId);
+    Optional<Booking> findByIdAndItem_Owner_Id(Long bookingId, Long userId);
 
     List<Booking> findByBookerId(Long bookerId);
 
@@ -35,9 +29,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByItem_Owner_IdAndStatus(Long itemOwnerId, BookingStatus status);
 
-    Optional<Booking> findFirstByItemAndStatusIsNotAndStartBeforeOrderByStartDesc(Item item, BookingStatus status, LocalDateTime start);
+    Optional<Booking> findFirstByItemAndStatusIsNotAndStartBefore(Item item, BookingStatus status, LocalDateTime start, Sort sort);
 
-    Optional<Booking> findFirstByItemAndStatusIsNotAndStartAfterOrderByStart(Item item, BookingStatus status, LocalDateTime start);
+    Optional<Booking> findFirstByItemAndStatusIsNotAndStartAfter(Item item, BookingStatus status, LocalDateTime start, Sort sort);
 
     List<Booking> findAllByItemAndBooker(Item item, User user);
 }

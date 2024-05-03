@@ -1,12 +1,12 @@
 package ru.practicum.shareit.item;
 
-import lombok.*;
+import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.item.dto.ItemDtoRequest;
 import ru.practicum.shareit.item.dto.ItemDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDtoResponseWithBookingDates;
 import ru.practicum.shareit.item.model.Item;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@UtilityClass
 public class ItemMapper {
     public static ItemDtoResponse toItemDtoResponse(Item item) {
         if (item == null) {

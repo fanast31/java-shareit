@@ -1,12 +1,11 @@
 package ru.practicum.shareit.item;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.item.dto.CommentDtoRequest;
 import ru.practicum.shareit.item.dto.CommentDtoResponse;
 import ru.practicum.shareit.item.model.Comment;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@UtilityClass
 public class CommentMapper {
 
     public static CommentDtoResponse toCommentDtoResponse(Comment comment) {

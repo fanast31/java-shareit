@@ -1,11 +1,11 @@
 package ru.practicum.shareit.user;
 
-import lombok.*;
+import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.user.dto.UserDtoRequest;
 import ru.practicum.shareit.user.dto.UserDtoResponse;
 import ru.practicum.shareit.user.model.User;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@UtilityClass
 public class UserMapper {
 
     public static UserDtoResponse toUserDtoResponse(User user) {

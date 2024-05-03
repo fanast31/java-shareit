@@ -7,7 +7,8 @@ import javax.validation.constraints.*;
 
 @Entity
 @Table(name = "users", schema = "public")
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

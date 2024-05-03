@@ -57,7 +57,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDtoResponse updateBookingStatus(long bookingId, long userId, boolean approved) {
 
-        Booking booking = bookingRepository.bookingForUpdate(bookingId, userId)
+        Booking booking = bookingRepository.findByIdAndItem_Owner_Id(bookingId, userId)
                 .orElseThrow(() -> new DataNotFoundException("Booking not found or not access for update"));
 
         if (approved) {

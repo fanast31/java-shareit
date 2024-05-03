@@ -36,7 +36,6 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>1.4.199</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -61,7 +60,6 @@
 		<dependency>
 			<groupId>com.querydsl</groupId>
 			<artifactId>querydsl-jpa</artifactId>
-<!--			<version>5.0.0</version>-->
 		</dependency>
 	</dependencies>
 
