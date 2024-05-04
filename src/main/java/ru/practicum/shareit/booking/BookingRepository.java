@@ -21,15 +21,13 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Optional<Booking> findByIdAndItem_Owner_Id(Long bookingId, Long userId);
 
-    List<Booking> findByBookerId(Long bookerId);
-
     List<Booking> findByBookerId(Long bookerId, Sort sort);
 
-    List<Booking> findByBookerIdAndStatus(Long bookerId, BookingStatus status);
+    List<Booking> findByBookerIdAndStatus(Long bookerId, BookingStatus status, Sort sort);
 
-    List<Booking> findByItem_Owner_Id(Long itemOwnerId);
+    List<Booking> findByItem_Owner_Id(Long itemOwnerId, Sort sort);
 
-    List<Booking> findByItem_Owner_IdAndStatus(Long itemOwnerId, BookingStatus status);
+    List<Booking> findByItem_Owner_IdAndStatus(Long itemOwnerId, BookingStatus status, Sort sort);
 
     Optional<Booking> findFirstByItemAndStatusIsNotAndStartBefore(
             Item item, BookingStatus status, LocalDateTime start, Sort sort);
@@ -41,9 +39,16 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByBooker_IdAndEndIsBefore(Long bookingId, LocalDateTime now, Sort sort);
 
+    List<Booking> findByItem_Owner_IdAndEndIsBefore(Long bookingId, LocalDateTime now, Sort sort);
+
     List<Booking> findByBooker_IdAndStartIsAfter(Long bookingId, LocalDateTime now, Sort sort);
 
+    List<Booking> findByItem_Owner_IdAndStartIsAfter(Long bookingId, LocalDateTime now, Sort sort);
+
     List<Booking> findByBooker_IdAndStartIsBeforeAndEndIsAfter(
+            Long userId, LocalDateTime start, LocalDateTime end, Sort sort);
+
+    List<Booking> findByItem_Owner_IdAndStartIsBeforeAndEndIsAfter(
             Long userId, LocalDateTime start, LocalDateTime end, Sort sort);
 
 }

@@ -106,10 +106,10 @@ public class BookingServiceImpl implements BookingService {
                 list = bookingRepository.findByBooker_IdAndStartIsAfter(userId, now, SORT_START_DESC);
                 break;
             case WAITING:
-                list = bookingRepository.findByBookerIdAndStatus(userId, BookingStatus.WAITING);
+                list = bookingRepository.findByBookerIdAndStatus(userId, BookingStatus.WAITING, SORT_START_DESC);
                 break;
             case REJECTED:
-                list = bookingRepository.findByBookerIdAndStatus(userId, BookingStatus.REJECTED);
+                list = bookingRepository.findByBookerIdAndStatus(userId, BookingStatus.REJECTED, SORT_START_DESC);
                 break;
         }
 
@@ -132,28 +132,22 @@ public class BookingServiceImpl implements BookingService {
 
         switch (state) {
             case ALL:
-                list = bookingRepository.findByItem_Owner_Id(userId);
+                list = bookingRepository.findByItem_Owner_Id(userId, SORT_START_DESC);
                 break;
             case CURRENT:
-                list = bookingRepository.findByItem_Owner_Id(userId).stream()
-                        .filter(booking -> !now.isBefore(booking.getStart()) && !now.isAfter(booking.getEnd()))
-                        .collect(Collectors.toList());
+                list = bookingRepository.findByItem_Owner_IdAndStartIsBeforeAndEndIsAfter(userId, now, now, SORT_START_DESC);
                 break;
             case PAST:
-                list = bookingRepository.findByItem_Owner_Id(userId).stream()
-                        .filter(booking -> now.isAfter(booking.getEnd()))
-                        .collect(Collectors.toList());
+                list = bookingRepository.findByItem_Owner_IdAndEndIsBefore(userId, now, SORT_START_DESC);
                 break;
             case FUTURE:
-                list = bookingRepository.findByItem_Owner_Id(userId).stream()
-                        .filter(booking -> now.isBefore(booking.getStart()))
-                        .collect(Collectors.toList());
+                list = bookingRepository.findByItem_Owner_IdAndStartIsAfter(userId, now, SORT_START_DESC);
                 break;
             case WAITING:
-                list = bookingRepository.findByItem_Owner_IdAndStatus(userId, BookingStatus.WAITING);
+                list = bookingRepository.findByItem_Owner_IdAndStatus(userId, BookingStatus.WAITING, SORT_START_DESC);
                 break;
             case REJECTED:
-                list = bookingRepository.findByItem_Owner_IdAndStatus(userId, BookingStatus.REJECTED);
+                list = bookingRepository.findByItem_Owner_IdAndStatus(userId, BookingStatus.REJECTED, SORT_START_DESC);
                 break;
         }
 
@@ -162,7 +156,6 @@ public class BookingServiceImpl implements BookingService {
         }
 
         return list.stream()
-                .sorted(Comparator.comparing(Booking::getStart).reversed())
                 .map(BookingMapper::toBookingDtoResponse)
                 .collect(Collectors.toList());
     }
