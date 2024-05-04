@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.*;
 
 import javax.validation.Valid;
 import java.util.Collections;
@@ -18,35 +18,46 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ResponseEntity<ItemDto> create(
+    public ResponseEntity<ItemDtoResponse> createItem(
             @RequestHeader("X-Sharer-User-Id") long userId,
-            @Valid @RequestBody ItemDto itemDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(itemService.create(userId, itemDto));
+            @Valid @RequestBody ItemDtoRequest itemDtoRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(itemService.createItem(userId, itemDtoRequest));
     }
 
     @PatchMapping("/{itemId}")
-    public ResponseEntity<ItemDto> update(
+    public ResponseEntity<ItemDtoResponse> update(
             @RequestHeader("X-Sharer-User-Id") long userId,
             @PathVariable long itemId,
-            @RequestBody ItemDto itemDto) {
-        return ResponseEntity.ok().body(itemService.update(userId, itemId, itemDto));
+            @RequestBody ItemDtoRequest itemDtoRequest) {
+        return ResponseEntity.ok().body(itemService.update(userId, itemId, itemDtoRequest));
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<ItemDto> get(@PathVariable long itemId) {
-        return ResponseEntity.ok().body(itemService.get(itemId));
+    public ResponseEntity<ItemDtoResponseWithBookingDates> get(
+            @RequestHeader("X-Sharer-User-Id") long userId,
+            @PathVariable long itemId) {
+        return ResponseEntity.ok().body(itemService.getItemDtoResponse(itemId, userId));
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDto>> getAll(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public ResponseEntity<List<ItemDtoResponseWithBookingDates>> getAll(@RequestHeader("X-Sharer-User-Id") long userId) {
         return ResponseEntity.ok().body(itemService.getAll(userId));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ItemDto>> searchItems(@RequestParam("text") String searchText) {
+    public ResponseEntity<List<ItemDtoResponse>> searchItems(@RequestParam("text") String searchText) {
         if (searchText == null || searchText.isBlank()) {
             return ResponseEntity.ok().body(Collections.emptyList());
         }
         return ResponseEntity.ok(itemService.searchByText(searchText));
     }
+
+    @PostMapping("/{itemId}/comment")
+    public ResponseEntity<CommentDtoResponse> createComment(
+            @RequestHeader("X-Sharer-User-Id") long userId,
+            @PathVariable long itemId,
+            @Valid @RequestBody CommentDtoRequest commentDtoRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(itemService.createComment(userId, itemId, commentDtoRequest));
+    }
+
 }

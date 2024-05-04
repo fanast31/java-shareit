@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserDtoResponse;
+import ru.practicum.shareit.user.dto.UserDtoRequest;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -17,22 +18,22 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserDto> create(@Valid @RequestBody UserDto userDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(userDto));
+    public ResponseEntity<UserDtoResponse> create(@Valid @RequestBody UserDtoRequest userDtoRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(userDtoRequest));
     }
 
     @PatchMapping("/{userId}")
-    public ResponseEntity<UserDto> update(@PathVariable long userId, @RequestBody UserDto userDto) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.update(userId, userDto));
+    public ResponseEntity<UserDtoResponse> update(@PathVariable long userId, @RequestBody UserDtoRequest userDtoRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.update(userId, userDtoRequest));
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserDto> get(@PathVariable long userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserDto(userId));
+    public ResponseEntity<UserDtoResponse> get(@PathVariable long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserDtoResponse(userId));
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> getAll() {
+    public ResponseEntity<List<UserDtoResponse>> getAll() {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getAll());
     }
 
