@@ -28,19 +28,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    private final ItemRepository itemRepository;
-
-    private final UserRepository userRepository;
-
-    private final BookingRepository bookingRepository;
-
-    private final CommentRepository commentRepository;
-
-    private final ItemRequestRepository itemRequestRepository;
-
     public static final Sort SORT_START_DESC = Sort.by(Sort.Direction.DESC, "start");
-
     public static final Sort SORT_START_ASC = Sort.by(Sort.Direction.ASC, "start");
+    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
     public ItemDtoResponse createItem(long userId, ItemDtoRequest itemDtoRequest) {
@@ -67,7 +61,6 @@ public class ItemServiceImpl implements ItemService {
         if (bookingRepository.findAllByItemAndBooker(item, user).stream().noneMatch(b -> b.isFinished(now))) {
             throw new BadRequestException("No finished bookings for this user and thi item were found");
         }
-        ;
 
         Comment comment = CommentMapper.toComment(commentDtoRequest);
         comment.setCreated(now);

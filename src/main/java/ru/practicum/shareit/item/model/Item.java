@@ -1,4 +1,3 @@
-
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
