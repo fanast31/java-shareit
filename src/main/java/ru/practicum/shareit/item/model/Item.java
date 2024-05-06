@@ -40,7 +40,7 @@ public class Item {
     private User owner;
 
     @JoinColumn(name = "request_id")
-    @OneToOne
+    @ManyToOne
     @ToString.Exclude
     private ItemRequest request;
 

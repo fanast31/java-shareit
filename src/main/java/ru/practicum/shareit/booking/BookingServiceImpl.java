@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,11 +16,11 @@ import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.utils.PaginationUtils;
 
 import java.time.LocalDateTime;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -87,29 +88,33 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDtoResponse> getBookingsForCurrentBooker(long userId, BookingState state) {
+    public List<BookingDtoResponse> getBookingsForCurrentBooker(
+            long userId, BookingState state, Integer from, Integer size) {
+
+        Pageable page = PaginationUtils.createPageable(from, size, SORT_START_DESC);
 
         LocalDateTime now = LocalDateTime.now();
         List<Booking> list = new ArrayList<>();
 
         switch (state) {
             case ALL:
-                list = bookingRepository.findByBookerId(userId, SORT_START_DESC);
+                list = bookingRepository.findByBookerId(userId, page);
                 break;
             case CURRENT:
-                list = bookingRepository.findByBooker_IdAndStartIsBeforeAndEndIsAfter(userId, now, now, SORT_START_DESC);
+                list = bookingRepository.findByBooker_IdAndStartIsBeforeAndEndIsAfter(
+                        userId, now, now, page);
                 break;
             case PAST:
-                list = bookingRepository.findByBooker_IdAndEndIsBefore(userId, now, SORT_START_DESC);
+                list = bookingRepository.findByBooker_IdAndEndIsBefore(userId, now, page);
                 break;
             case FUTURE:
-                list = bookingRepository.findByBooker_IdAndStartIsAfter(userId, now, SORT_START_DESC);
+                list = bookingRepository.findByBooker_IdAndStartIsAfter(userId, now, page);
                 break;
             case WAITING:
-                list = bookingRepository.findByBookerIdAndStatus(userId, BookingStatus.WAITING, SORT_START_DESC);
+                list = bookingRepository.findByBookerIdAndStatus(userId, BookingStatus.WAITING, page);
                 break;
             case REJECTED:
-                list = bookingRepository.findByBookerIdAndStatus(userId, BookingStatus.REJECTED, SORT_START_DESC);
+                list = bookingRepository.findByBookerIdAndStatus(userId, BookingStatus.REJECTED, page);
                 break;
         }
 
@@ -125,29 +130,35 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDtoResponse> getBookingsForAllItemsWhereOwnerIsCurrentUser(long userId, BookingState state) {
+    public List<BookingDtoResponse> getBookingsForAllItemsWhereOwnerIsCurrentUser(
+            long userId, BookingState state, Integer from, Integer size) {
+
+        Pageable page = PaginationUtils.createPageable(from, size, SORT_START_DESC);
 
         LocalDateTime now = LocalDateTime.now();
         List<Booking> list = new ArrayList<>();
 
         switch (state) {
             case ALL:
-                list = bookingRepository.findByItem_Owner_Id(userId, SORT_START_DESC);
+                list = bookingRepository.findByItem_Owner_Id(userId, page);
                 break;
             case CURRENT:
-                list = bookingRepository.findByItem_Owner_IdAndStartIsBeforeAndEndIsAfter(userId, now, now, SORT_START_DESC);
+                list = bookingRepository.findByItem_Owner_IdAndStartIsBeforeAndEndIsAfter(
+                        userId, now, now, page);
                 break;
             case PAST:
-                list = bookingRepository.findByItem_Owner_IdAndEndIsBefore(userId, now, SORT_START_DESC);
+                list = bookingRepository.findByItem_Owner_IdAndEndIsBefore(userId, now, page);
                 break;
             case FUTURE:
-                list = bookingRepository.findByItem_Owner_IdAndStartIsAfter(userId, now, SORT_START_DESC);
+                list = bookingRepository.findByItem_Owner_IdAndStartIsAfter(userId, now, page);
                 break;
             case WAITING:
-                list = bookingRepository.findByItem_Owner_IdAndStatus(userId, BookingStatus.WAITING, SORT_START_DESC);
+                list = bookingRepository.findByItem_Owner_IdAndStatus(
+                        userId, BookingStatus.WAITING, page);
                 break;
             case REJECTED:
-                list = bookingRepository.findByItem_Owner_IdAndStatus(userId, BookingStatus.REJECTED, SORT_START_DESC);
+                list = bookingRepository.findByItem_Owner_IdAndStatus(
+                        userId, BookingStatus.REJECTED, page);
                 break;
         }
 

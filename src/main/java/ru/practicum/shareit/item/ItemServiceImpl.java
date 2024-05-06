@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,8 +14,10 @@ import ru.practicum.shareit.exceptions.DataNotFoundException;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.utils.PaginationUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,6 +36,8 @@ public class ItemServiceImpl implements ItemService {
 
     private final CommentRepository commentRepository;
 
+    private final ItemRequestRepository itemRequestRepository;
+
     public static final Sort SORT_START_DESC = Sort.by(Sort.Direction.DESC, "start");
 
     public static final Sort SORT_START_ASC = Sort.by(Sort.Direction.ASC, "start");
@@ -42,6 +47,10 @@ public class ItemServiceImpl implements ItemService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("User not found"));
         Item item = ItemMapper.toItem(itemDtoRequest);
+        if (itemDtoRequest.getRequestId() != null) {
+            item.setRequest(itemRequestRepository.findById(itemDtoRequest.getRequestId())
+                    .orElseThrow(() -> new DataNotFoundException("ItemRequest not found")));
+        }
         item.setOwner(user);
         return ItemMapper.toItemDtoResponse(itemRepository.save(item));
     }
@@ -118,8 +127,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDtoResponseWithBookingDates> getAll(long userId) {
-        return itemRepository.findAllByOwnerId(userId).stream()
+    public List<ItemDtoResponseWithBookingDates> getAll(long userId, Integer from, Integer size) {
+        Pageable page = PaginationUtils.createPageable(from, size);
+        return itemRepository.findAllByOwnerId(userId, page).stream()
                 .map(item -> addNecessaryFields(item, userId))
                 .collect(Collectors.toList());
     }
@@ -153,8 +163,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDtoResponse> searchByText(String searchText) {
-        return itemRepository.searchByText(searchText).stream()
+    public List<ItemDtoResponse> searchByText(String searchText, Integer from, Integer size) {
+        Pageable page = PaginationUtils.createPageable(from, size);
+        return itemRepository.searchByText(searchText, page).stream()
                 .map(ItemMapper::toItemDtoResponse)
                 .collect(Collectors.toList());
     }
