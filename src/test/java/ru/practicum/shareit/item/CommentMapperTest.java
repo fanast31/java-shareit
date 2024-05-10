@@ -1,10 +1,9 @@
 package ru.practicum.shareit.item;
 
 import org.junit.jupiter.api.Test;
-
 import ru.practicum.shareit.item.dto.CommentDtoRequest;
-import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.dto.CommentDtoResponse;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
@@ -46,8 +45,9 @@ class CommentMapperTest {
     @Test
     void toComment() {
 
-        CommentDtoRequest dtoRequest = new CommentDtoRequest();
-        dtoRequest.setText("Needs improvement");
+        CommentDtoRequest dtoRequest = CommentDtoRequest.builder()
+                .text("Needs improvement")
+                .build();
 
         Comment comment = CommentMapper.toComment(dtoRequest);
 

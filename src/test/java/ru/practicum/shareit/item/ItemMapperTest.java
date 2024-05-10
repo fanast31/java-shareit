@@ -7,7 +7,8 @@ import ru.practicum.shareit.item.dto.ItemDtoResponseWithBookingDates;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.model.ItemRequest;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class ItemMapperTest {
 
@@ -75,10 +76,11 @@ class ItemMapperTest {
     @Test
     void toItem() {
 
-        ItemDtoRequest dtoRequest = new ItemDtoRequest();
-        dtoRequest.setName("Drill");
-        dtoRequest.setDescription("Drill1");
-        dtoRequest.setAvailable(true);
+        ItemDtoRequest dtoRequest = ItemDtoRequest.builder()
+                .name("Drill")
+                .description("Drill1")
+                .available(true)
+                .build();
 
         Item item = ItemMapper.toItem(dtoRequest);
 

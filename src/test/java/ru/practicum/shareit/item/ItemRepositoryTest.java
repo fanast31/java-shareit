@@ -10,13 +10,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -28,11 +31,18 @@ class ItemRepositoryTest {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    ItemRequestRepository itemRequestRepository;
+
     private User owner1;
+
+    private User owner2;
+
+    private User owner3;
 
     @BeforeEach
     public void addItems() {
-        
+
         owner1 = User.builder()
                 .email("mail1@mail.ru")
                 .name("name1")
@@ -46,7 +56,7 @@ class ItemRepositoryTest {
                 .available(true)
                 .build());
 
-        User owner2 = User.builder()
+        owner2 = User.builder()
                 .email("mail2@mail.ru")
                 .name("name2")
                 .build();
@@ -59,7 +69,7 @@ class ItemRepositoryTest {
                 .available(true)
                 .build());
 
-        User owner3 = User.builder()
+        owner3 = User.builder()
                 .email("mail3@mail.ru")
                 .name("name3")
                 .build();
@@ -93,20 +103,49 @@ class ItemRepositoryTest {
 
     @Test
     void findAllByRequestIn() {
+
         ItemRequest request1 = ItemRequest.builder()
                 .requester(owner1)
                 .description("Need an item1")
+                .created(LocalDateTime.now())
                 .build();
 
         ItemRequest request2 = ItemRequest.builder()
-                .requester(owner1)
+                .requester(owner2)
                 .description("Looking for item2")
+                .created(LocalDateTime.now())
                 .build();
+
+        itemRequestRepository.save(request1);
+        itemRequestRepository.save(request2);
+
+        Item item1 = itemRepository.findById(1L).orElse(null);
+        assertNotNull(item1);
+        item1.setRequest(request1);
+        itemRepository.save(item1);
+
+        Item item2 = itemRepository.findById(2L).orElse(null);
+        assertNotNull(item2);
+        item2.setRequest(request2);
+        itemRepository.save(item2);
+
+        List<ItemRequest> itemRequests = List.of(request1, request2);
+
+        Sort sort = Sort.by(Sort.Direction.ASC, "name");
+
+        List<Item> items = itemRepository.findAllByRequestIn(itemRequests, sort);
+
+        assertEquals(2, items.size());
+        assertEquals(item1.getName(), items.get(0).getName());
+        assertEquals(item2.getName(), items.get(1).getName());
+
     }
 
     @AfterEach
     public void deleteItems() {
+        itemRequestRepository.deleteAll();
         itemRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
 }

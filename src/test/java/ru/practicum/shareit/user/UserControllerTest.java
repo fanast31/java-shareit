@@ -1,23 +1,24 @@
 package ru.practicum.shareit.user;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.mockito.Mockito.*;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.practicum.shareit.user.dto.UserDtoRequest;
 import ru.practicum.shareit.user.dto.UserDtoResponse;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
 public class UserControllerTest {
@@ -32,12 +33,12 @@ public class UserControllerTest {
     private ObjectMapper mapper;
 
     private UserDtoRequest userDtoRequest;
-    
+
     private UserDtoResponse userDtoResponse;
 
     @BeforeEach
     void setUp() {
-        
+
         userDtoRequest = UserDtoRequest.builder()
                 .name("Andrei")
                 .email("mail@gmail.com")
@@ -48,7 +49,7 @@ public class UserControllerTest {
                 .name("Andrei")
                 .email("mail@gmail.com")
                 .build();
-        
+
     }
 
     @Test
@@ -96,7 +97,7 @@ public class UserControllerTest {
     @Test
     void testGetAllUsers() throws Exception {
 
-        List<UserDtoResponse> users = Arrays.asList(userDtoResponse);
+        List<UserDtoResponse> users = Collections.singletonList(userDtoResponse);
         Mockito.when(userService.getAll()).thenReturn(users);
 
         mockMvc.perform(get("/users"))

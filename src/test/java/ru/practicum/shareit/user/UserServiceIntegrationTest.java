@@ -39,7 +39,7 @@ public class UserServiceIntegrationTest {
                 .email("user@gmail.com")
                 .build();
 
-        userDtoRequest = userDtoRequest.builder()
+        userDtoRequest = UserDtoRequest.builder()
                 .name(user.getName())
                 .email(user.getEmail())
                 .build();
