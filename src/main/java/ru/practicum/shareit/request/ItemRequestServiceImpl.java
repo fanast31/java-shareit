@@ -113,7 +113,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return items.stream().collect(Collectors.groupingBy(Item::getRequest));
     }
 
-    private User getUserById(Long userId) {
+    public User getUserById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("User not found"));
     }

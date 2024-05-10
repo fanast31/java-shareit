@@ -38,8 +38,6 @@ class ItemRepositoryTest {
 
     private User owner2;
 
-    private User owner3;
-
     @BeforeEach
     public void addItems() {
 
@@ -66,19 +64,6 @@ class ItemRepositoryTest {
                 .name("item2")
                 .description("23")
                 .owner(owner2)
-                .available(true)
-                .build());
-
-        owner3 = User.builder()
-                .email("mail3@mail.ru")
-                .name("name3")
-                .build();
-        userRepository.save(owner3);
-        itemRepository.save(Item.builder()
-                .id(3L)
-                .name("item3")
-                .description("31")
-                .owner(owner3)
                 .available(true)
                 .build());
 
