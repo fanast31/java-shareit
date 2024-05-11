@@ -41,8 +41,6 @@ public class ItemRequestServiceUnitTest {
     private UserRepository userRepository;
     @Mock
     private ItemRepository itemRepository;
-    @Mock
-    private ItemRequestRepository itemRequestRepository;
     @InjectMocks
     private ItemRequestServiceImpl itemRequestService;
 
