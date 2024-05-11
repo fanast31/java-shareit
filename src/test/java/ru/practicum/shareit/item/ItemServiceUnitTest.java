@@ -55,11 +55,11 @@ class ItemServiceUnitTest {
     CommentRepository commentRepository;
     LocalDateTime now;
     Long invalidId;
-    Long owner_Id;
+    Long ownerId;
     User owner;
-    Long requester_Id;
+    Long requesterId;
     User requester;
-    Long request_Id;
+    Long requestId;
     ItemRequest request;
 
     @BeforeEach
@@ -68,23 +68,23 @@ class ItemServiceUnitTest {
         now = LocalDateTime.now();
         invalidId = 111L;
 
-        owner_Id = 1L;
+        ownerId = 1L;
         owner = User.builder()
-                .id(owner_Id)
+                .id(ownerId)
                 .name("owner")
                 .email("owner@gmail.com")
                 .build();
 
-        requester_Id = 2L;
+        requesterId = 2L;
         requester = User.builder()
-                .id(requester_Id)
+                .id(requesterId)
                 .name("requester")
                 .email("requester@gmail.com")
                 .build();
 
-        request_Id = 1L;
+        requestId = 1L;
         request = ItemRequest.builder()
-                .id(request_Id)
+                .id(requestId)
                 .description("request")
                 .created(now)
                 .requester(requester)
@@ -95,14 +95,14 @@ class ItemServiceUnitTest {
     @Test
     void createItem_Success() {
 
-        when(userRepository.findById(owner_Id)).thenReturn(Optional.of(owner));
-        when(itemRequestRepository.findById(request_Id)).thenReturn(Optional.of(request));
+        when(userRepository.findById(ownerId)).thenReturn(Optional.of(owner));
+        when(itemRequestRepository.findById(requestId)).thenReturn(Optional.of(request));
 
         ItemDtoRequest itemDtoRequest = ItemDtoRequest.builder()
                 .name("drill")
                 .description("drill for drilling")
                 .available(true)
-                .requestId(request_Id)
+                .requestId(requestId)
                 .build();
         Item item = ItemMapper.toItem(itemDtoRequest);
         item.setId(1L);
@@ -111,7 +111,7 @@ class ItemServiceUnitTest {
         ItemDtoResponse itemDtoResponse = ItemMapper.toItemDtoResponse(item);
         when(itemRepository.save(any(Item.class))).thenReturn(item);
 
-        ItemDtoResponse actualItemDto = itemService.createItem(owner_Id, itemDtoRequest);
+        ItemDtoResponse actualItemDto = itemService.createItem(ownerId, itemDtoRequest);
 
         Assertions.assertNotNull(actualItemDto.getId());
         Assertions.assertEquals(itemDtoResponse.getName(), actualItemDto.getName());
@@ -125,7 +125,7 @@ class ItemServiceUnitTest {
     void createItem_ItemRequestNotFound() {
 
         when(itemRequestRepository.findById(invalidId)).thenReturn(Optional.empty());
-        when(userRepository.findById(owner_Id)).thenReturn(Optional.of(owner));
+        when(userRepository.findById(ownerId)).thenReturn(Optional.of(owner));
 
         ItemDtoRequest itemDtoRequest = ItemDtoRequest.builder()
                 .name("drill")
@@ -136,7 +136,7 @@ class ItemServiceUnitTest {
 
         DataNotFoundException thrown = assertThrows(
                 DataNotFoundException.class,
-                () -> itemService.createItem(owner_Id, itemDtoRequest),
+                () -> itemService.createItem(ownerId, itemDtoRequest),
                 "Expected createItem() to throw, but it did not"
         );
 
