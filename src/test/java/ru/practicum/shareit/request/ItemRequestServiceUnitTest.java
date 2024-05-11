@@ -6,17 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.exceptions.BadRequestException;
-import ru.practicum.shareit.exceptions.DataNotFoundException;
 import ru.practicum.shareit.item.ItemRepository;
-import ru.practicum.shareit.item.ItemService;
-import ru.practicum.shareit.item.ItemServiceImpl;
-import ru.practicum.shareit.item.dto.ItemDtoResponse;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dto.ItemRDtoRequest;
 import ru.practicum.shareit.request.dto.ItemRDtoResponse;
@@ -26,12 +19,10 @@ import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,7 +30,11 @@ public class ItemRequestServiceUnitTest {
 
     public static final Sort SORT_CREATED_DESC = Sort.by(Sort.Direction.DESC, "created");
     public static final Sort SORT_ID_ASC = Sort.by(Sort.Direction.ASC, "id");
-
+    User requester;
+    ItemRequest itemRequest;
+    ItemRequest itemRequestSaved;
+    ItemRDtoRequest itemRequestDto;
+    ItemRDtoResponse itemRDtoResponse;
     @Mock
     private ItemRequestRepository requestRepository;
     @Mock
@@ -48,18 +43,8 @@ public class ItemRequestServiceUnitTest {
     private ItemRepository itemRepository;
     @Mock
     private ItemRequestRepository itemRequestRepository;
-
-
     @InjectMocks
     private ItemRequestServiceImpl itemRequestService;
-
-    User requester;
-
-    ItemRequest itemRequest;
-    ItemRequest itemRequestSaved;
-    ItemRDtoRequest itemRequestDto;
-    ItemRDtoResponse itemRDtoResponse;
-
 
     @BeforeEach
     void setUp() {
