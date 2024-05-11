@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,9 +16,9 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query("SELECT i FROM Item i WHERE " +
             "(LOWER(i.name) LIKE CONCAT('%', LOWER(:searchText), '%') OR LOWER(i.description) LIKE CONCAT('%', LOWER(:searchText), '%')) " +
             "AND i.available = true")
-    List<Item> searchByText(@Param("searchText") String searchText, Pageable page);
+    Page<Item> searchByText(@Param("searchText") String searchText, Pageable page);
 
-    List<Item> findAllByOwnerId(Long userId, Pageable page);
+    Page<Item> findAllByOwnerId(Long userId, Pageable page);
 
     List<Item> findAllByRequestIn(List<ItemRequest> itemRequests, Sort sort);
 

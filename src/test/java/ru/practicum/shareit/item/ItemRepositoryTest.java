@@ -72,7 +72,7 @@ class ItemRepositoryTest {
     @Test
     void searchByText() {
         Pageable page = PageRequest.of(0, 10);
-        List<Item> items = itemRepository.searchByText("m1", page);
+        List<Item> items = itemRepository.searchByText("m1", page).getContent();
 
         assertEquals(items.size(), 1);
     }
@@ -80,7 +80,7 @@ class ItemRepositoryTest {
     @Test
     void findAllByOwnerId() {
         Pageable page = PageRequest.of(0, 10);
-        List<Item> items = itemRepository.findAllByOwnerId(owner1.getId(), page);
+        List<Item> items = itemRepository.findAllByOwnerId(owner1.getId(), page).getContent();
 
         assertEquals(items.size(), 1);
         assertEquals(items.get(0).getName(), "item1");

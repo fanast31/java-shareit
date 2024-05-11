@@ -7,8 +7,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.model.Booking;
@@ -37,7 +38,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BookingServiceUnitTest {
-    public static final Sort SORT_START_DESC = Sort.by(Sort.Direction.DESC, "start");
     @InjectMocks
     BookingServiceImpl bookingService;
     @Mock
@@ -313,14 +313,14 @@ class BookingServiceUnitTest {
     @Test
     void testGetBookingsForCurrentBooker_All() {
 
-        List<Booking> mockedList = Arrays.asList(booking2, booking3);
+        Page<Booking> mockedList = new PageImpl<>(Arrays.asList(booking2, booking3));
         List<BookingDtoResponse> mockedDtoList = Stream.of(booking2, booking3)
                 .map(BookingMapper::toBookingDtoResponse)
                 .collect(Collectors.toList());
 
         Integer from = 0;
         Integer size = 10;
-        Pageable page = PaginationUtils.createPageable(from, size, SORT_START_DESC);
+        Pageable page = PaginationUtils.createPageable(from, size, PaginationUtils.SORT_START_DESC);
         when(bookingRepository.findByBookerId(bookerId23, page)).thenReturn(mockedList);
 
         List<BookingDtoResponse> result = bookingService.getBookingsForCurrentBooker(
@@ -336,11 +336,11 @@ class BookingServiceUnitTest {
     @Test
     void testGetBookingsForCurrentBooker_Current() {
 
-        List<Booking> mockedList = Collections.singletonList(booking);
+        Page<Booking> mockedList = new PageImpl<>(Collections.singletonList(booking));
         List<BookingDtoResponse> mockedDtoList = mockedList.stream()
                 .map(BookingMapper::toBookingDtoResponse)
                 .collect(Collectors.toList());
-        Pageable page = PaginationUtils.createPageable(0, 10, SORT_START_DESC);
+        Pageable page = PaginationUtils.createPageable(0, 10, PaginationUtils.SORT_START_DESC);
 
         when(bookingRepository.findByBooker_IdAndStartIsBeforeAndEndIsAfter(
                 eq(bookerId), any(LocalDateTime.class), any(LocalDateTime.class), eq(page))).thenReturn(mockedList);
@@ -357,11 +357,11 @@ class BookingServiceUnitTest {
     @Test
     void testGetBookingsForCurrentBooker_Past() {
 
-        List<Booking> mockedList = Collections.singletonList(booking);
+        Page<Booking> mockedList = new PageImpl<>(Collections.singletonList(booking));
         List<BookingDtoResponse> mockedDtoList = mockedList.stream()
                 .map(BookingMapper::toBookingDtoResponse)
                 .collect(Collectors.toList());
-        Pageable page = PaginationUtils.createPageable(0, 10, SORT_START_DESC);
+        Pageable page = PaginationUtils.createPageable(0, 10, PaginationUtils.SORT_START_DESC);
 
         when(bookingRepository.findByBooker_IdAndEndIsBefore(
                 eq(bookerId), any(LocalDateTime.class), eq(page))).thenReturn(mockedList);
@@ -378,11 +378,11 @@ class BookingServiceUnitTest {
     @Test
     void testGetBookingsForCurrentBooker_Future() {
 
-        List<Booking> mockedList = Collections.singletonList(booking);
+        Page<Booking> mockedList = new PageImpl<>(Collections.singletonList(booking));
         List<BookingDtoResponse> mockedDtoList = mockedList.stream()
                 .map(BookingMapper::toBookingDtoResponse)
                 .collect(Collectors.toList());
-        Pageable page = PaginationUtils.createPageable(0, 10, SORT_START_DESC);
+        Pageable page = PaginationUtils.createPageable(0, 10, PaginationUtils.SORT_START_DESC);
 
         when(bookingRepository.findByBooker_IdAndStartIsAfter(
                 eq(bookerId), any(LocalDateTime.class), eq(page))).thenReturn(mockedList);
@@ -399,11 +399,11 @@ class BookingServiceUnitTest {
     @Test
     void testGetBookingsForCurrentBooker_Waiting() {
 
-        List<Booking> mockedList = Collections.singletonList(booking);
+        Page<Booking> mockedList = new PageImpl<>(Collections.singletonList(booking));
         List<BookingDtoResponse> mockedDtoList = mockedList.stream()
                 .map(BookingMapper::toBookingDtoResponse)
                 .collect(Collectors.toList());
-        Pageable page = PaginationUtils.createPageable(0, 10, SORT_START_DESC);
+        Pageable page = PaginationUtils.createPageable(0, 10, PaginationUtils.SORT_START_DESC);
 
         when(bookingRepository.findByBookerIdAndStatus(
                 bookerId, BookingStatus.WAITING, page)).thenReturn(mockedList);
@@ -420,11 +420,11 @@ class BookingServiceUnitTest {
     @Test
     void testGetBookingsForCurrentBooker_Rejected() {
 
-        List<Booking> mockedList = Collections.singletonList(booking);
+        Page<Booking> mockedList = new PageImpl<>(Collections.singletonList(booking));
         List<BookingDtoResponse> mockedDtoList = mockedList.stream()
                 .map(BookingMapper::toBookingDtoResponse)
                 .collect(Collectors.toList());
-        Pageable page = PaginationUtils.createPageable(0, 10, SORT_START_DESC);
+        Pageable page = PaginationUtils.createPageable(0, 10, PaginationUtils.SORT_START_DESC);
 
         when(bookingRepository.findByBookerIdAndStatus(
                 bookerId, BookingStatus.REJECTED, page)).thenReturn(mockedList);
@@ -443,8 +443,8 @@ class BookingServiceUnitTest {
 
         Integer from = 0;
         Integer size = 10;
-        Pageable page = PaginationUtils.createPageable(from, size, SORT_START_DESC);
-        when(bookingRepository.findByBookerId(bookerId23, page)).thenReturn(Collections.emptyList());
+        Pageable page = PaginationUtils.createPageable(from, size, PaginationUtils.SORT_START_DESC);
+        when(bookingRepository.findByBookerId(bookerId23, page)).thenReturn(new PageImpl<>(Collections.emptyList()));
 
         assertThrows(DataNotFoundException.class, () -> {
             bookingService.getBookingsForCurrentBooker(
@@ -456,14 +456,14 @@ class BookingServiceUnitTest {
     @Test
     void testGetBookingsForAllItemsWhereOwnerIsCurrentUser_All() {
 
-        List<Booking> mockedList = Arrays.asList(booking2, booking3);
+        Page<Booking> mockedList = new PageImpl<>(Arrays.asList(booking2, booking3));
         List<BookingDtoResponse> mockedDtoList = Stream.of(booking2, booking3)
                 .map(BookingMapper::toBookingDtoResponse)
                 .collect(Collectors.toList());
 
         Integer from = 0;
         Integer size = 10;
-        Pageable page = PaginationUtils.createPageable(from, size, SORT_START_DESC);
+        Pageable page = PaginationUtils.createPageable(from, size, PaginationUtils.SORT_START_DESC);
         when(bookingRepository.findByItem_Owner_Id(bookerId23, page)).thenReturn(mockedList);
 
         List<BookingDtoResponse> result = bookingService.getBookingsForAllItemsWhereOwnerIsCurrentUser(
@@ -479,11 +479,11 @@ class BookingServiceUnitTest {
     @Test
     void testGetBookingsForAllItemsWhereOwnerIsCurrentUser_Current() {
 
-        List<Booking> mockedList = Collections.singletonList(booking);
+        Page<Booking> mockedList = new PageImpl<>(Collections.singletonList(booking));
         List<BookingDtoResponse> mockedDtoList = mockedList.stream()
                 .map(BookingMapper::toBookingDtoResponse)
                 .collect(Collectors.toList());
-        Pageable page = PaginationUtils.createPageable(0, 10, SORT_START_DESC);
+        Pageable page = PaginationUtils.createPageable(0, 10, PaginationUtils.SORT_START_DESC);
 
         when(bookingRepository.findByItem_Owner_IdAndStartIsBeforeAndEndIsAfter(
                 eq(bookerId), any(LocalDateTime.class), any(LocalDateTime.class), eq(page))).thenReturn(mockedList);
@@ -500,11 +500,11 @@ class BookingServiceUnitTest {
     @Test
     void testGetBookingsForAllItemsWhereOwnerIsCurrentUser_Past() {
 
-        List<Booking> mockedList = Collections.singletonList(booking);
+        Page<Booking> mockedList = new PageImpl<>(Collections.singletonList(booking));
         List<BookingDtoResponse> mockedDtoList = mockedList.stream()
                 .map(BookingMapper::toBookingDtoResponse)
                 .collect(Collectors.toList());
-        Pageable page = PaginationUtils.createPageable(0, 10, SORT_START_DESC);
+        Pageable page = PaginationUtils.createPageable(0, 10, PaginationUtils.SORT_START_DESC);
 
         when(bookingRepository.findByItem_Owner_IdAndEndIsBefore(
                 eq(bookerId), any(LocalDateTime.class), eq(page))).thenReturn(mockedList);
@@ -521,11 +521,11 @@ class BookingServiceUnitTest {
     @Test
     void testGetBookingsForAllItemsWhereOwnerIsCurrentUser_Future() {
 
-        List<Booking> mockedList = Collections.singletonList(booking);
+        Page<Booking> mockedList = new PageImpl<>(Collections.singletonList(booking));
         List<BookingDtoResponse> mockedDtoList = mockedList.stream()
                 .map(BookingMapper::toBookingDtoResponse)
                 .collect(Collectors.toList());
-        Pageable page = PaginationUtils.createPageable(0, 10, SORT_START_DESC);
+        Pageable page = PaginationUtils.createPageable(0, 10, PaginationUtils.SORT_START_DESC);
 
         when(bookingRepository.findByItem_Owner_IdAndStartIsAfter(
                 eq(bookerId), any(LocalDateTime.class), eq(page))).thenReturn(mockedList);
@@ -542,11 +542,11 @@ class BookingServiceUnitTest {
     @Test
     void testGetBookingsForAllItemsWhereOwnerIsCurrentUser_Waiting() {
 
-        List<Booking> mockedList = Collections.singletonList(booking);
+        Page<Booking> mockedList = new PageImpl<>(Collections.singletonList(booking));
         List<BookingDtoResponse> mockedDtoList = mockedList.stream()
                 .map(BookingMapper::toBookingDtoResponse)
                 .collect(Collectors.toList());
-        Pageable page = PaginationUtils.createPageable(0, 10, SORT_START_DESC);
+        Pageable page = PaginationUtils.createPageable(0, 10, PaginationUtils.SORT_START_DESC);
 
         when(bookingRepository.findByItem_Owner_IdAndStatus(
                 bookerId, BookingStatus.WAITING, page)).thenReturn(mockedList);
@@ -563,11 +563,11 @@ class BookingServiceUnitTest {
     @Test
     void testGetBookingsForAllItemsWhereOwnerIsCurrentUser_Rejected() {
 
-        List<Booking> mockedList = Collections.singletonList(booking);
+        Page<Booking> mockedList = new PageImpl<>(Collections.singletonList(booking));
         List<BookingDtoResponse> mockedDtoList = mockedList.stream()
                 .map(BookingMapper::toBookingDtoResponse)
                 .collect(Collectors.toList());
-        Pageable page = PaginationUtils.createPageable(0, 10, SORT_START_DESC);
+        Pageable page = PaginationUtils.createPageable(0, 10, PaginationUtils.SORT_START_DESC);
 
         when(bookingRepository.findByItem_Owner_IdAndStatus(
                 bookerId, BookingStatus.REJECTED, page)).thenReturn(mockedList);
@@ -586,8 +586,8 @@ class BookingServiceUnitTest {
 
         Integer from = 0;
         Integer size = 10;
-        Pageable page = PaginationUtils.createPageable(from, size, SORT_START_DESC);
-        when(bookingRepository.findByItem_Owner_Id(bookerId23, page)).thenReturn(Collections.emptyList());
+        Pageable page = PaginationUtils.createPageable(from, size, PaginationUtils.SORT_START_DESC);
+        when(bookingRepository.findByItem_Owner_Id(bookerId23, page)).thenReturn(new PageImpl<>(Collections.emptyList()));
 
         assertThrows(DataNotFoundException.class, () -> {
             bookingService.getBookingsForAllItemsWhereOwnerIsCurrentUser(

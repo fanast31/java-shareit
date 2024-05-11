@@ -1,8 +1,8 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingMapper;
@@ -20,16 +20,16 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.utils.PaginationUtils;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    public static final Sort SORT_START_DESC = Sort.by(Sort.Direction.DESC, "start");
-    public static final Sort SORT_START_ASC = Sort.by(Sort.Direction.ASC, "start");
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
@@ -136,11 +136,11 @@ public class ItemServiceImpl implements ItemService {
 
             final Booking lastBooking = bookingRepository
                     .findFirstByItemAndStatusIsNotAndStartBefore(
-                            item, BookingStatus.REJECTED, start, SORT_START_DESC)
+                            item, BookingStatus.REJECTED, start, PaginationUtils.SORT_START_DESC)
                     .orElse(null);
             final Booking nextBooking = bookingRepository
                     .findFirstByItemAndStatusIsNotAndStartAfter(
-                            item, BookingStatus.REJECTED, start, SORT_START_ASC)
+                            item, BookingStatus.REJECTED, start, PaginationUtils.SORT_START_ASC)
                     .orElse(null);
 
             newItem.setLastBooking(BookingMapper.toBookingDtoResponseForItem(lastBooking));
@@ -158,7 +158,11 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     public List<ItemDtoResponse> searchByText(String searchText, Integer from, Integer size) {
         Pageable page = PaginationUtils.createPageable(from, size);
-        return itemRepository.searchByText(searchText, page).stream()
+        Page<Item> list = itemRepository.searchByText(searchText, page);
+        if (list == null) {
+            return Collections.emptyList();
+        }
+        return list.stream()
                 .map(ItemMapper::toItemDtoResponse)
                 .collect(Collectors.toList());
     }

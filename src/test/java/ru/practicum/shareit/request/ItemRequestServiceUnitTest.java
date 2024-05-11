@@ -7,7 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
@@ -16,6 +17,7 @@ import ru.practicum.shareit.request.dto.ItemRDtoResponse;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.utils.PaginationUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -28,8 +30,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class ItemRequestServiceUnitTest {
 
-    public static final Sort SORT_CREATED_DESC = Sort.by(Sort.Direction.DESC, "created");
-    public static final Sort SORT_ID_ASC = Sort.by(Sort.Direction.ASC, "id");
     User requester;
     ItemRequest itemRequest;
     ItemRequest itemRequestSaved;
@@ -130,7 +130,7 @@ public class ItemRequestServiceUnitTest {
         mockMap.put(itemRequest2, List.of(item3));
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
-        when(itemRepository.findAllByRequestIn(anyList(), eq(SORT_ID_ASC))).thenReturn(items);
+        when(itemRepository.findAllByRequestIn(anyList(), eq(PaginationUtils.SORT_ID_ASC))).thenReturn(items);
 
         List<ItemRDtoResponse> responses = itemRequestService.getUserRequests(userId);
 
@@ -173,8 +173,13 @@ public class ItemRequestServiceUnitTest {
                 .build();
         List<Item> items = List.of(item1, item2, item3);
 
+        Pageable page = PaginationUtils.createPageable(from, size, PaginationUtils.SORT_CREATED_DESC);
+
         when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
-        when(itemRepository.findAllByRequestIn(anyList(), eq(SORT_ID_ASC))).thenReturn(items);
+        when(itemRepository.findAllByRequestIn(anyList(), eq(PaginationUtils.SORT_ID_ASC))).thenReturn(items);
+
+        when(requestRepository.findAllByRequesterNot(mockUser, page))
+                .thenReturn(new PageImpl<>(List.of(itemRequest1, itemRequest2)));
 
         List<ItemRDtoResponse> responses = itemRequestService.getAllRequests(userId, from, size);
 

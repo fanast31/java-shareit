@@ -1,8 +1,8 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
@@ -19,21 +19,19 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.utils.PaginationUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
 
-    public static final Sort SORT_START_DESC = Sort.by(Sort.Direction.DESC, "start");
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
 
     @Override
-    @Transactional
     public BookingDtoResponse createBooking(long userId, BookingDtoRequest bookingDtoRequest) {
 
         Booking booking = BookingMapper.toBooking(bookingDtoRequest);
@@ -89,10 +87,10 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingDtoResponse> getBookingsForCurrentBooker(
             long userId, BookingState state, Integer from, Integer size) {
 
-        Pageable page = PaginationUtils.createPageable(from, size, SORT_START_DESC);
+        Pageable page = PaginationUtils.createPageable(from, size, PaginationUtils.SORT_START_DESC);
 
         LocalDateTime now = LocalDateTime.now();
-        List<Booking> list = new ArrayList<>();
+        Page<Booking> list = null;
 
         switch (state) {
             case ALL:
@@ -116,7 +114,7 @@ public class BookingServiceImpl implements BookingService {
                 break;
         }
 
-        if (list.isEmpty()) {
+        if (list.getContent().isEmpty()) {
             throw new DataNotFoundException("Bookings not found");
         }
 
@@ -131,10 +129,10 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingDtoResponse> getBookingsForAllItemsWhereOwnerIsCurrentUser(
             long userId, BookingState state, Integer from, Integer size) {
 
-        Pageable page = PaginationUtils.createPageable(from, size, SORT_START_DESC);
+        Pageable page = PaginationUtils.createPageable(from, size, PaginationUtils.SORT_START_DESC);
 
         LocalDateTime now = LocalDateTime.now();
-        List<Booking> list = new ArrayList<>();
+        Page<Booking> list = null;
 
         switch (state) {
             case ALL:
@@ -160,7 +158,7 @@ public class BookingServiceImpl implements BookingService {
                 break;
         }
 
-        if (list.isEmpty()) {
+        if (list.getContent().isEmpty()) {
             throw new DataNotFoundException("Bookings not found");
         }
 

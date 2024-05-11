@@ -8,9 +8,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.model.Booking;
@@ -23,6 +24,7 @@ import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.utils.PaginationUtils;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -39,8 +41,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ItemServiceUnitTest {
 
-    public static final Sort SORT_START_DESC = Sort.by(Sort.Direction.DESC, "start");
-    public static final Sort SORT_START_ASC = Sort.by(Sort.Direction.ASC, "start");
     @InjectMocks
     ItemServiceImpl itemService;
     @Mock
@@ -339,14 +339,14 @@ class ItemServiceUnitTest {
                         Mockito.eq(itemSaved),
                         Mockito.eq(BookingStatus.REJECTED),
                         Mockito.any(LocalDateTime.class),
-                        Mockito.eq(SORT_START_DESC)))
+                        Mockito.eq(PaginationUtils.SORT_START_DESC)))
                 .thenReturn(Optional.of(lastBooking));
         Mockito
                 .when(bookingRepository.findFirstByItemAndStatusIsNotAndStartAfter(
                         Mockito.eq(itemSaved),
                         Mockito.eq(BookingStatus.REJECTED),
                         Mockito.any(LocalDateTime.class),
-                        Mockito.eq(SORT_START_ASC)))
+                        Mockito.eq(PaginationUtils.SORT_START_ASC)))
                 .thenReturn(Optional.of(nextBooking));
         Mockito
                 .when(commentRepository.findAllByItem(itemSaved))
@@ -373,7 +373,7 @@ class ItemServiceUnitTest {
         item2.setName("Test Item 2");
         item2.setDescription("Description 2");
 
-        List<Item> itemList = Arrays.asList(item1, item2);
+        Page<Item> itemList = new PageImpl<>(Arrays.asList(item1, item2));
 
         Pageable page = PageRequest.of(0, 10);
         Mockito.when(itemRepository.searchByText(searchText, page)).thenReturn(itemList);

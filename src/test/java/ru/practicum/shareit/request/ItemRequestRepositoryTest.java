@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.item.ItemRepository;
@@ -25,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ItemRequestRepositoryTest {
 
-    public static final Sort SORT_CREATED_DESC = Sort.by(Sort.Direction.DESC, "created");
     @Autowired
     ItemRepository itemRepository;
     @Autowired
@@ -72,7 +70,7 @@ class ItemRequestRepositoryTest {
     void shouldFindAllByRequester() {
 
         List<ItemRequest> results = itemRequestRepository.findAllByRequester(
-                requester, SORT_CREATED_DESC);
+                requester, PaginationUtils.SORT_CREATED_DESC);
 
         assertThat(results).hasSize(1);
         assertEquals(results.get(0), itemRequest);
@@ -83,9 +81,9 @@ class ItemRequestRepositoryTest {
     @Transactional
     void shouldFindAllByRequesterNot() {
 
-        Pageable page = PaginationUtils.createPageable(1, 10, SORT_CREATED_DESC);
+        Pageable page = PaginationUtils.createPageable(1, 10, PaginationUtils.SORT_CREATED_DESC);
 
-        List<ItemRequest> results = itemRequestRepository.findAllByRequesterNot(owner, page);
+        List<ItemRequest> results = itemRequestRepository.findAllByRequesterNot(owner, page).getContent();
 
         assertThat(results).hasSize(1);
         assertEquals(results.get(0), itemRequest);

@@ -2,7 +2,6 @@ package ru.practicum.shareit.request;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
@@ -24,17 +23,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ItemRequestServiceImpl implements ItemRequestService {
 
-    public static final Sort SORT_CREATED_DESC = Sort.by(Sort.Direction.DESC, "created");
-    public static final Sort SORT_ID_ASC = Sort.by(Sort.Direction.ASC, "id");
     private final ItemRequestRepository itemRequestRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
 
     @Override
-    @Transactional
     public ItemRDtoResponse createRequest(long userId, ItemRDtoRequest itemDtoRequest) {
 
         User user = getUserById(userId);
@@ -51,7 +48,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
         User user = getUserById(userId);
 
-        List<ItemRequest> results = itemRequestRepository.findAllByRequester(user, SORT_CREATED_DESC);
+        List<ItemRequest> results = itemRequestRepository.findAllByRequester(user, PaginationUtils.SORT_CREATED_DESC);
         Map<ItemRequest, List<Item>> map = getItemsMap(results);
 
         return mapToItemRDtoResponse(map, results);
@@ -59,13 +56,14 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemRDtoResponse> getAllRequests(long userId, Integer from, Integer size) {
 
         User user = getUserById(userId);
 
-        Pageable page = PaginationUtils.createPageable(from, size, SORT_CREATED_DESC);
+        Pageable page = PaginationUtils.createPageable(from, size, PaginationUtils.SORT_CREATED_DESC);
 
-        List<ItemRequest> requests = itemRequestRepository.findAllByRequesterNot(user, page);
+        List<ItemRequest> requests = itemRequestRepository.findAllByRequesterNot(user, page).getContent();
         Map<ItemRequest, List<Item>> map = getItemsMap(requests);
 
         return mapToItemRDtoResponse(map, requests);
@@ -73,6 +71,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ItemRDtoResponse getRequest(long userId, long requestId) {
 
         getUserById(userId);
@@ -80,7 +79,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         ItemRequest itemRequest = itemRequestRepository.findById(requestId)
                 .orElseThrow(() -> new DataNotFoundException("Item request not found"));
 
-        List<ItemDtoResponse> items = itemRepository.findAllByRequestIn(List.of(itemRequest), SORT_ID_ASC).stream()
+        List<ItemDtoResponse> items = itemRepository.findAllByRequestIn(List.of(itemRequest), PaginationUtils.SORT_ID_ASC).stream()
                 .map(ItemMapper::toItemDtoResponse)
                 .collect(Collectors.toList());
 
@@ -109,7 +108,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     private Map<ItemRequest, List<Item>> getItemsMap(List<ItemRequest> requests) {
-        List<Item> items = itemRepository.findAllByRequestIn(requests, SORT_ID_ASC);
+        List<Item> items = itemRepository.findAllByRequestIn(requests, PaginationUtils.SORT_ID_ASC);
         return items.stream().collect(Collectors.groupingBy(Item::getRequest));
     }
 
