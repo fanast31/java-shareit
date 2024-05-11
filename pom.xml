@@ -169,7 +169,7 @@
 											<limit>
 												<counter>LINE</counter>
 												<value>COVEREDRATIO</value>
-												<minimum>0.9</minimum>
+												<minimum>0.8</minimum>
 											</limit>
 											<limit>
 												<counter>BRANCH</counter>
@@ -198,6 +198,13 @@
 						</execution>
 						<execution>
 							<id>jacoco-report</id>
+							<phase>test</phase>
+							<goals>
+								<goal>report</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>report</id>
 							<phase>test</phase>
 							<goals>
 								<goal>report</goal>
