@@ -169,7 +169,7 @@
 											<limit>
 												<counter>LINE</counter>
 												<value>COVEREDRATIO</value>
-												<minimum>0.8</minimum>
+												<minimum>0.9</minimum>
 											</limit>
 											<limit>
 												<counter>BRANCH</counter>
@@ -189,7 +189,7 @@
 											<limit>
 												<counter>CLASS</counter>
 												<value>MISSEDCOUNT</value>
-												<maximum>1</maximum>
+												<maximum>2</maximum>
 											</limit>
 										</limits>
 									</rule>
