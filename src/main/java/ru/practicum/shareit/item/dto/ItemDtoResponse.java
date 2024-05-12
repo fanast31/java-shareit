@@ -15,4 +15,6 @@ public class ItemDtoResponse {
 
     private Boolean available;
 
+    private Long requestId;
+
 }

@@ -1,7 +1,8 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingMapper;
@@ -13,35 +14,37 @@ import ru.practicum.shareit.exceptions.DataNotFoundException;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.utils.PaginationUtils;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
-
     private final UserRepository userRepository;
-
     private final BookingRepository bookingRepository;
-
     private final CommentRepository commentRepository;
-
-    public static final Sort SORT_START_DESC = Sort.by(Sort.Direction.DESC, "start");
-
-    public static final Sort SORT_START_ASC = Sort.by(Sort.Direction.ASC, "start");
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
     public ItemDtoResponse createItem(long userId, ItemDtoRequest itemDtoRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("User not found"));
         Item item = ItemMapper.toItem(itemDtoRequest);
+        if (itemDtoRequest.getRequestId() != null) {
+            item.setRequest(itemRequestRepository.findById(itemDtoRequest.getRequestId())
+                    .orElseThrow(() -> new DataNotFoundException("ItemRequest not found")));
+        }
         item.setOwner(user);
         return ItemMapper.toItemDtoResponse(itemRepository.save(item));
     }
@@ -58,7 +61,6 @@ public class ItemServiceImpl implements ItemService {
         if (bookingRepository.findAllByItemAndBooker(item, user).stream().noneMatch(b -> b.isFinished(now))) {
             throw new BadRequestException("No finished bookings for this user and thi item were found");
         }
-        ;
 
         Comment comment = CommentMapper.toComment(commentDtoRequest);
         comment.setCreated(now);
@@ -118,8 +120,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDtoResponseWithBookingDates> getAll(long userId) {
-        return itemRepository.findAllByOwnerId(userId).stream()
+    public List<ItemDtoResponseWithBookingDates> getAll(long userId, Integer from, Integer size) {
+        Pageable page = PaginationUtils.createPageable(from, size);
+        return itemRepository.findAllByOwnerId(userId, page).stream()
                 .map(item -> addNecessaryFields(item, userId))
                 .collect(Collectors.toList());
     }
@@ -133,11 +136,11 @@ public class ItemServiceImpl implements ItemService {
 
             final Booking lastBooking = bookingRepository
                     .findFirstByItemAndStatusIsNotAndStartBefore(
-                            item, BookingStatus.REJECTED, start, SORT_START_DESC)
+                            item, BookingStatus.REJECTED, start, PaginationUtils.SORT_START_DESC)
                     .orElse(null);
             final Booking nextBooking = bookingRepository
                     .findFirstByItemAndStatusIsNotAndStartAfter(
-                            item, BookingStatus.REJECTED, start, SORT_START_ASC)
+                            item, BookingStatus.REJECTED, start, PaginationUtils.SORT_START_ASC)
                     .orElse(null);
 
             newItem.setLastBooking(BookingMapper.toBookingDtoResponseForItem(lastBooking));
@@ -153,8 +156,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDtoResponse> searchByText(String searchText) {
-        return itemRepository.searchByText(searchText).stream()
+    public List<ItemDtoResponse> searchByText(String searchText, Integer from, Integer size) {
+        Pageable page = PaginationUtils.createPageable(from, size);
+        Page<Item> list = itemRepository.searchByText(searchText, page);
+        if (list == null) {
+            return Collections.emptyList();
+        }
+        return list.stream()
                 .map(ItemMapper::toItemDtoResponse)
                 .collect(Collectors.toList());
     }

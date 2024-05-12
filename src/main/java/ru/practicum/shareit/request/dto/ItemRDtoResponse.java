@@ -2,19 +2,20 @@ package ru.practicum.shareit.request.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.user.dto.UserDtoResponse;
+import ru.practicum.shareit.item.dto.ItemDtoResponse;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
-public class ItemRequestDtoResponse {
+public class ItemRDtoResponse {
 
     private Long id;
 
     private String description;
 
-    private UserDtoResponse requester;
+    private List<ItemDtoResponse> items;
 
     private LocalDateTime created;
 

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
@@ -63,9 +64,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(long userId) {
-        User userDB = userRepository.findById(userId)
-                .orElseThrow(() -> new DataNotFoundException("User not found"));
-        userRepository.delete(userDB);
+        userRepository.deleteById(userId);
     }
 
 }

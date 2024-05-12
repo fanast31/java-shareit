@@ -24,4 +24,6 @@ public class ItemDtoResponseWithBookingDates {
 
     private List<CommentDtoResponse> comments;
 
+    private Long requestId;
+
 }

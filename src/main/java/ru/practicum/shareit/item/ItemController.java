@@ -5,8 +5,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.utils.HttpHeaders;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,45 +22,51 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<ItemDtoResponse> createItem(
-            @RequestHeader("X-Sharer-User-Id") long userId,
+            @RequestHeader(HttpHeaders.USER_ID) long userId,
             @Valid @RequestBody ItemDtoRequest itemDtoRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(itemService.createItem(userId, itemDtoRequest));
     }
 
     @PatchMapping("/{itemId}")
     public ResponseEntity<ItemDtoResponse> update(
-            @RequestHeader("X-Sharer-User-Id") long userId,
+            @RequestHeader(HttpHeaders.USER_ID) long userId,
             @PathVariable long itemId,
             @RequestBody ItemDtoRequest itemDtoRequest) {
-        return ResponseEntity.ok().body(itemService.update(userId, itemId, itemDtoRequest));
+        return ResponseEntity.ok(itemService.update(userId, itemId, itemDtoRequest));
     }
 
     @GetMapping("/{itemId}")
     public ResponseEntity<ItemDtoResponseWithBookingDates> get(
-            @RequestHeader("X-Sharer-User-Id") long userId,
+            @RequestHeader(HttpHeaders.USER_ID) long userId,
             @PathVariable long itemId) {
-        return ResponseEntity.ok().body(itemService.getItemDtoResponse(itemId, userId));
+        return ResponseEntity.ok(itemService.getItemDtoResponse(itemId, userId));
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDtoResponseWithBookingDates>> getAll(@RequestHeader("X-Sharer-User-Id") long userId) {
-        return ResponseEntity.ok().body(itemService.getAll(userId));
+    public ResponseEntity<List<ItemDtoResponseWithBookingDates>> getAll(
+            @RequestHeader(HttpHeaders.USER_ID) long userId,
+            @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+            @Positive @RequestParam(defaultValue = "10") Integer size) {
+        return ResponseEntity.ok(itemService.getAll(userId, from, size));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ItemDtoResponse>> searchItems(@RequestParam("text") String searchText) {
+    public ResponseEntity<List<ItemDtoResponse>> searchItems(
+            @RequestParam("text") String searchText,
+            @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+            @Positive @RequestParam(defaultValue = "10") Integer size) {
         if (searchText == null || searchText.isBlank()) {
             return ResponseEntity.ok().body(Collections.emptyList());
         }
-        return ResponseEntity.ok(itemService.searchByText(searchText));
+        return ResponseEntity.ok(itemService.searchByText(searchText, from, size));
     }
 
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<CommentDtoResponse> createComment(
-            @RequestHeader("X-Sharer-User-Id") long userId,
+            @RequestHeader(HttpHeaders.USER_ID) long userId,
             @PathVariable long itemId,
             @Valid @RequestBody CommentDtoRequest commentDtoRequest) {
-        return ResponseEntity.status(HttpStatus.OK).body(itemService.createComment(userId, itemId, commentDtoRequest));
+        return ResponseEntity.ok(itemService.createComment(userId, itemId, commentDtoRequest));
     }
 
 }

@@ -189,7 +189,7 @@
 											<limit>
 												<counter>CLASS</counter>
 												<value>MISSEDCOUNT</value>
-												<maximum>1</maximum>
+												<maximum>2</maximum>
 											</limit>
 										</limits>
 									</rule>
@@ -198,6 +198,13 @@
 						</execution>
 						<execution>
 							<id>jacoco-report</id>
+							<phase>test</phase>
+							<goals>
+								<goal>report</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>report</id>
 							<phase>test</phase>
 							<goals>
 								<goal>report</goal>

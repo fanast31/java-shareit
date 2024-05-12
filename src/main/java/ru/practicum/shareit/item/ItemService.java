@@ -17,8 +17,8 @@ public interface ItemService {
 
     ItemDtoResponseWithBookingDates getItemDtoResponse(long itemId, long userId);
 
-    List<ItemDtoResponseWithBookingDates> getAll(long userId);
+    List<ItemDtoResponseWithBookingDates> getAll(long userId, Integer from, Integer size);
 
-    List<ItemDtoResponse> searchByText(String searchText);
+    List<ItemDtoResponse> searchByText(String searchText, Integer from, Integer size);
 
 }
