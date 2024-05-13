@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRDtoRequest;
-import ru.practicum.shareit.request.dto.ItemRDtoResponse;
 import ru.practicum.shareit.utils.HttpHeaders;
 
 import javax.validation.Valid;
@@ -21,7 +20,7 @@ public class ItemRequestController {
     private final ItemRequestService itemRequestService;
 
     @PostMapping
-    public ResponseEntity<ItemRDtoResponse> createItemRequest(
+    public ResponseEntity<Object> createItemRequest(
             @RequestHeader(HttpHeaders.USER_ID) long userId,
             @Valid @RequestBody ItemRDtoRequest itemDtoRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)

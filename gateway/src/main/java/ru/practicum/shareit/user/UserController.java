@@ -5,41 +5,39 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDtoRequest;
-import ru.practicum.shareit.user.dto.UserDtoResponse;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserClient userClient;
 
     @PostMapping
-    public ResponseEntity<UserDtoResponse> create(@Valid @RequestBody UserDtoRequest userDtoRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(userDtoRequest));
+    public ResponseEntity<Object> create(@Valid @RequestBody UserDtoRequest userDtoRequest) {
+        return userClient.createUser(userDtoRequest);
     }
 
     @PatchMapping("/{userId}")
-    public ResponseEntity<UserDtoResponse> update(@PathVariable long userId, @RequestBody UserDtoRequest userDtoRequest) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.update(userId, userDtoRequest));
+    public ResponseEntity<Object> update(@PathVariable long userId, @RequestBody UserDtoRequest userDtoRequest) {
+        return userClient.updateUser(userId, userDtoRequest);
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserDtoResponse> get(@PathVariable long userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserDtoResponse(userId));
+    public ResponseEntity<Object> get(@PathVariable long userId) {
+        return userClient.getUserById(userId);
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDtoResponse>> getAll() {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getAll());
+    public ResponseEntity<Object> getAll() {
+        return userClient.getAllUsers();
     }
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> delete(@PathVariable long userId) {
-        userService.delete(userId);
+        userClient.deleteUser(userId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
