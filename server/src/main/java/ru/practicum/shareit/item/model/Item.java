@@ -5,8 +5,6 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "items", schema = "public")
@@ -22,15 +20,12 @@ public class Item {
     private Long id;
 
     @Column(nullable = false)
-    @NotBlank
     private String name;
 
     @Column(nullable = false)
-    @NotBlank
     private String description;
 
     @Column(name = "is_available", nullable = false)
-    @NotNull
     private Boolean available;
 
     @JoinColumn(name = "owner_id")

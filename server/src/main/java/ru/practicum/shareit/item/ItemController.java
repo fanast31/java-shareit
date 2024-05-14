@@ -42,16 +42,16 @@ public class ItemController {
     @GetMapping
     public ResponseEntity<List<ItemDtoResponseWithBookingDates>> getAll(
             @RequestHeader(HttpHeaders.USER_ID) long userId,
-            @RequestParam(defaultValue = "0") Integer from,
-            @RequestParam(defaultValue = "10") Integer size) {
+            @RequestParam Integer from,
+            @RequestParam Integer size) {
         return ResponseEntity.ok(itemService.getAll(userId, from, size));
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<ItemDtoResponse>> searchItems(
             @RequestParam("text") String searchText,
-            @RequestParam(defaultValue = "0") Integer from,
-            @RequestParam(defaultValue = "10") Integer size) {
+            @RequestParam Integer from,
+            @RequestParam Integer size) {
         if (searchText == null || searchText.isBlank()) {
             return ResponseEntity.ok().body(Collections.emptyList());
         }

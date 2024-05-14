@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.model.BookingState;
-import ru.practicum.shareit.exceptions.UnsupportedStatusException;
 import ru.practicum.shareit.utils.HttpHeaders;
 
 import java.util.List;
@@ -44,32 +43,20 @@ public class BookingController {
     @GetMapping
     public ResponseEntity<List<BookingDtoResponse>> getBookingsForCurrentBooker(
             @RequestHeader(HttpHeaders.USER_ID) long userId,
-            @RequestParam(required = false, defaultValue = "ALL") String state,
-            @RequestParam(defaultValue = "0") Integer from,
-            @RequestParam(defaultValue = "10") Integer size) {
-        BookingState bookingState;
-        try {
-            bookingState = BookingState.valueOf(state);
-        } catch (IllegalArgumentException e) {
-            throw new UnsupportedStatusException(e.getMessage());
-        }
-        return ResponseEntity.ok().body(bookingService.getBookingsForCurrentBooker(userId, bookingState, from, size));
+            @RequestParam BookingState state,
+            @RequestParam Integer from,
+            @RequestParam Integer size) {
+        return ResponseEntity.ok().body(bookingService.getBookingsForCurrentBooker(userId, state, from, size));
     }
 
     @GetMapping("/owner")
     public ResponseEntity<List<BookingDtoResponse>> getBookingsForAllItemsCurrentUser(
             @RequestHeader(HttpHeaders.USER_ID) long userId,
-            @RequestParam(required = false, defaultValue = "ALL") String state,
-            @RequestParam(defaultValue = "0") Integer from,
-            @RequestParam(defaultValue = "10") Integer size) {
-        BookingState bookingState;
-        try {
-            bookingState = BookingState.valueOf(state);
-        } catch (IllegalArgumentException e) {
-            throw new UnsupportedStatusException(e.getMessage());
-        }
+            @RequestParam BookingState state,
+            @RequestParam Integer from,
+            @RequestParam Integer size) {
         return ResponseEntity.ok().body(
-                bookingService.getBookingsForAllItemsWhereOwnerIsCurrentUser(userId, bookingState, from, size));
+                bookingService.getBookingsForAllItemsWhereOwnerIsCurrentUser(userId, state, from, size));
     }
 
 }

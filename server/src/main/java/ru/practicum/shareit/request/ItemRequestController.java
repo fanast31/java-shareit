@@ -7,10 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRDtoRequest;
 import ru.practicum.shareit.request.dto.ItemRDtoResponse;
 import ru.practicum.shareit.utils.HttpHeaders;
-
-import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -23,7 +19,7 @@ public class ItemRequestController {
     @PostMapping
     public ResponseEntity<ItemRDtoResponse> createItemRequest(
             @RequestHeader(HttpHeaders.USER_ID) long userId,
-            @Valid @RequestBody ItemRDtoRequest itemDtoRequest) {
+            @RequestBody ItemRDtoRequest itemDtoRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(itemRequestService.createRequest(userId, itemDtoRequest));
     }
@@ -38,8 +34,8 @@ public class ItemRequestController {
     @GetMapping("/all")
     public ResponseEntity<List<ItemRDtoResponse>> getAllRequests(
             @RequestHeader(HttpHeaders.USER_ID) long userId,
-            @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
-            @Positive @RequestParam(defaultValue = "10") Integer size) {
+            @RequestParam Integer from,
+            @RequestParam Integer size) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(itemRequestService.getAllRequests(userId, from, size));
     }

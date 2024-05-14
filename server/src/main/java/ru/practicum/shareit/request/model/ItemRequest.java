@@ -4,7 +4,6 @@ import lombok.*;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,7 +20,6 @@ public class ItemRequest {
     private Long id;
 
     @Column(nullable = false)
-    @NotBlank
     private String description;
 
     @JoinColumn(name = "requester_id")
