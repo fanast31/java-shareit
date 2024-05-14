@@ -41,7 +41,11 @@ public class ItemClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getAll(long userId, Integer from, Integer size) {
-        return get("", userId);
+        Map<String, Object> parameters = Map.of(
+                "from", from,
+                "size", size
+        );
+        return get("?from={from}&size={size}", userId, parameters);
     }
 
     public ResponseEntity<Object> searchItems(String text, Integer from, Integer size) {
