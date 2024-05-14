@@ -7,9 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.utils.HttpHeaders;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,7 +20,7 @@ public class ItemController {
     @PostMapping
     public ResponseEntity<ItemDtoResponse> createItem(
             @RequestHeader(HttpHeaders.USER_ID) long userId,
-            @Valid @RequestBody ItemDtoRequest itemDtoRequest) {
+            @RequestBody ItemDtoRequest itemDtoRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(itemService.createItem(userId, itemDtoRequest));
     }
 
@@ -45,16 +42,16 @@ public class ItemController {
     @GetMapping
     public ResponseEntity<List<ItemDtoResponseWithBookingDates>> getAll(
             @RequestHeader(HttpHeaders.USER_ID) long userId,
-            @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
-            @Positive @RequestParam(defaultValue = "10") Integer size) {
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size) {
         return ResponseEntity.ok(itemService.getAll(userId, from, size));
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<ItemDtoResponse>> searchItems(
             @RequestParam("text") String searchText,
-            @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
-            @Positive @RequestParam(defaultValue = "10") Integer size) {
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size) {
         if (searchText == null || searchText.isBlank()) {
             return ResponseEntity.ok().body(Collections.emptyList());
         }
@@ -65,7 +62,7 @@ public class ItemController {
     public ResponseEntity<CommentDtoResponse> createComment(
             @RequestHeader(HttpHeaders.USER_ID) long userId,
             @PathVariable long itemId,
-            @Valid @RequestBody CommentDtoRequest commentDtoRequest) {
+            @RequestBody CommentDtoRequest commentDtoRequest) {
         return ResponseEntity.ok(itemService.createComment(userId, itemId, commentDtoRequest));
     }
 

@@ -4,20 +4,16 @@ import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
 @Builder
 public class BookingDtoRequest {
 
-    @NotNull
     private Long itemId;
 
-    @NotNull
     private LocalDateTime start;
 
-    @NotNull
     private LocalDateTime end;
 
     @AssertTrue(message = "Start should be before end")

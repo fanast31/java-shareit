@@ -1,7 +1,6 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
@@ -12,39 +11,38 @@ import ru.practicum.shareit.utils.HttpHeaders;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
 public class BookingController {
 
-    private final BookingService bookingService;
+    private final BookingClient bookingClient;
 
     @PostMapping
-    public ResponseEntity<BookingDtoResponse> createBooking(
+    public ResponseEntity<Object> createBooking(
             @RequestHeader(HttpHeaders.USER_ID) long userId,
             @Valid @RequestBody BookingDtoRequest bookingDtoRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.createBooking(userId, bookingDtoRequest));
+        return bookingClient.createBooking(userId, bookingDtoRequest);
     }
 
     @PatchMapping("/{bookingId}")
-    public ResponseEntity<BookingDtoResponse> updateBookingStatus(
+    public ResponseEntity<Object> updateBookingStatus(
             @RequestHeader(HttpHeaders.USER_ID) long userId,
             @PathVariable long bookingId,
             @RequestParam boolean approved) {
-        return ResponseEntity.ok().body(bookingService.updateBookingStatus(bookingId, userId, approved));
+        return bookingClient.updateBookingStatus(bookingId, userId, approved);
     }
 
     @GetMapping("/{bookingId}")
-    public ResponseEntity<BookingDtoResponse> getBookingById(
+    public ResponseEntity<Object> getBookingById(
             @RequestHeader(HttpHeaders.USER_ID) long userId,
             @PathVariable long bookingId) {
-        return ResponseEntity.ok().body(bookingService.getBookingById(bookingId, userId));
+        return bookingClient.getBookingById(userId, bookingId);
     }
 
     @GetMapping
-    public ResponseEntity<List<BookingDtoResponse>> getBookingsForCurrentBooker(
+    public ResponseEntity<Object> getBookingsForCurrentBooker(
             @RequestHeader(HttpHeaders.USER_ID) long userId,
             @Valid @RequestParam(required = false, defaultValue = "ALL") String state,
             @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
@@ -55,11 +53,11 @@ public class BookingController {
         } catch (IllegalArgumentException e) {
             throw new UnsupportedStatusException(e.getMessage());
         }
-        return ResponseEntity.ok().body(bookingService.getBookingsForCurrentBooker(userId, bookingState, from, size));
+        return bookingClient.getBookingsForCurrentBooker(userId, bookingState, from, size);
     }
 
     @GetMapping("/owner")
-    public ResponseEntity<List<BookingDtoResponse>> getBookingsForAllItemsCurrentUser(
+    public ResponseEntity<Object> getBookingsForAllItemsCurrentUser(
             @RequestHeader(HttpHeaders.USER_ID) long userId,
             @Valid @RequestParam(required = false, defaultValue = "ALL") String state,
             @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
@@ -70,8 +68,7 @@ public class BookingController {
         } catch (IllegalArgumentException e) {
             throw new UnsupportedStatusException(e.getMessage());
         }
-        return ResponseEntity.ok().body(
-                bookingService.getBookingsForAllItemsWhereOwnerIsCurrentUser(userId, bookingState, from, size));
+        return bookingClient.getBookingsForAllItemsWhereOwnerIsCurrentUser(userId, bookingState, from, size);
     }
 
 }

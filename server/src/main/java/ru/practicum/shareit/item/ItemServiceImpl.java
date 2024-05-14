@@ -121,7 +121,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public List<ItemDtoResponseWithBookingDates> getAll(long userId, Integer from, Integer size) {
-        Pageable page = PaginationUtils.createPageable(from, size);
+        Pageable page = PaginationUtils.createPageable(from, size, PaginationUtils.SORT_ID_ASC);
         return itemRepository.findAllByOwnerId(userId, page).stream()
                 .map(item -> addNecessaryFields(item, userId))
                 .collect(Collectors.toList());

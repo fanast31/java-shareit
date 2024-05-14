@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDtoRequest;
 import ru.practicum.shareit.user.dto.UserDtoResponse;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -18,7 +17,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserDtoResponse> create(@Valid @RequestBody UserDtoRequest userDtoRequest) {
+    public ResponseEntity<UserDtoResponse> create(@RequestBody UserDtoRequest userDtoRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(userDtoRequest));
     }
 
